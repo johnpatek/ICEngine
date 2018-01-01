@@ -4,6 +4,8 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Camera.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Component.h</itemPath>
       <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Image.h</itemPath>
       <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Material.h</itemPath>
     </logicalFolder>
@@ -41,6 +43,16 @@
       </toolsSet>
       <compileType>
       </compileType>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Camera.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Component.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Image.h"
             ex="false"
             tool="3"
@@ -77,6 +89,16 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Camera.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Component.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Image.h"
             ex="false"
             tool="3"
