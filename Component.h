@@ -6,15 +6,16 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
+#include "SystemManager.h"
+#include "GameObject.h"
+
 class Component
 {
 private:
-    //TODO: add implementation of GameObject
-    //GameObject mGameObject;
-    //void setup(GameObject& gameObject);
+    GameObject mGameObject;
+    void setup(GameObject& gameObject);
 protected:
-    //TODO: add implementation of SystemsManager
-    //SystemsManager mSystemsManager;
+    SystemManager mSystemManager;
 public:
     void init();
     
