@@ -10,6 +10,7 @@
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
                    projectFiles="true">
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/umlbyjordan.jpg</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -27,6 +28,9 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>C:\Users\Cate\Documents\BitWatchProjects\ICEngine</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
@@ -43,6 +47,11 @@
             flavor2="0">
       </item>
       <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Material.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/umlbyjordan.jpg"
             ex="false"
             tool="3"
             flavor2="0">
@@ -74,6 +83,11 @@
             flavor2="0">
       </item>
       <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Material.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/umlbyjordan.jpg"
             ex="false"
             tool="3"
             flavor2="0">
