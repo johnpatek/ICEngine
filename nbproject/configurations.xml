@@ -4,14 +4,36 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Application.h</itemPath>
       <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Camera.h</itemPath>
       <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Component.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/ComponentManager.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/DataBinder.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Engine.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/GameObject.h</itemPath>
       <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Image.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/InputManager.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/InternalRenderer.h</itemPath>
       <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Material.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Mesh.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/MeshRenderer.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Message.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/RenderManager.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/RenderTechnique.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Renderer.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/SceneManager.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/ShaderFile.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/SubMesh.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/SystemManager.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Transform.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/UIRenderable.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Vertex.h</itemPath>
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Window.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
                    projectFiles="true">
+      <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/ICE_ResourceManager_UML.jpg</itemPath>
       <itemPath>C:/Users/Cate/Documents/BitWatchProjects/ICEngine/umlbyjordan.jpg</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
@@ -43,6 +65,11 @@
       </toolsSet>
       <compileType>
       </compileType>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Application.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Camera.h"
             ex="false"
             tool="3"
@@ -53,12 +80,117 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/ComponentManager.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/DataBinder.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Engine.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/GameObject.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/ICE_ResourceManager_UML.jpg"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Image.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/InputManager.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/InternalRenderer.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Material.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Mesh.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/MeshRenderer.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Message.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/RenderManager.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/RenderTechnique.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Renderer.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/SceneManager.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/ShaderFile.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/SubMesh.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/SystemManager.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Transform.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/UIRenderable.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Vertex.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Window.h"
             ex="false"
             tool="3"
             flavor2="0">
@@ -89,6 +221,11 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Application.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Camera.h"
             ex="false"
             tool="3"
@@ -99,12 +236,117 @@
             tool="3"
             flavor2="0">
       </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/ComponentManager.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/DataBinder.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Engine.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/GameObject.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/ICE_ResourceManager_UML.jpg"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Image.h"
             ex="false"
             tool="3"
             flavor2="0">
       </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/InputManager.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/InternalRenderer.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
       <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Material.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Mesh.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/MeshRenderer.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Message.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/RenderManager.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/RenderTechnique.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Renderer.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/SceneManager.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/ShaderFile.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/SubMesh.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/SystemManager.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Transform.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/UIRenderable.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Vertex.h"
+            ex="false"
+            tool="3"
+            flavor2="0">
+      </item>
+      <item path="C:/Users/Cate/Documents/BitWatchProjects/ICEngine/Window.h"
             ex="false"
             tool="3"
             flavor2="0">
