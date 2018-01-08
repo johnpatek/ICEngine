@@ -18,6 +18,7 @@ PURPOSE
 ###### - Multicore Utilization using Job-System of worker threads, one for main game thread, others for systems
 ###### - Handle-table Object System for fast and reliable indexing and usage of game / system objects
 ###### - Memory Manager using Pool Allocation with Fragmentation Protection to see allocation patterns / tailer code for optimization
+###### - Reduce Excessive Compile-Time Coupling
 
 ---------------------------------------------------------------------------------------------------------
 CURRENT STANDING
