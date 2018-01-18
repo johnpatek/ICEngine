@@ -31,6 +31,9 @@ CURRENT STANDING
 - [x] Systems Manager / Managers Base Setup
 - [x] Vulkan API Base Foundation Setup
 - [x] Vulkan 3D Model Renderer Complete
+- [x] Vertex/Fragment Shader (.vert/.frag) --> .SPV
+- [ ] DirectX API Base Foundation Setup
+- [ ] DirectX 3D Model Renderer Complete
 - [x] Object Handle-table Design
 - [ ] Object Handle-table Implementation
 
