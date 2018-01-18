@@ -38,14 +38,12 @@ CURRENT STANDING
 - [ ] Object Handle-table Implementation
 
 ---------------------------------------------------------------------------------------------------------
-#### Authors / Responsibilities Currently
+#### Architecture / Designs
 ---------------------------------------------------------------------------------------------------------
 
-###### Original Engine Architecture Design - In Process of Revision
-![alt text](https://github.com/johnpatek/ICEngine/blob/master/umlbyjordan.jpg)
-
-###### Original Resource Manager Design - Post Revision - In Production
-![alt text](https://github.com/johnpatek/ICEngine/blob/master/ICE_ResourceManager_UML.jpg)
+###### Original Engine Architecture Design - In Process of Revision ###### Original Resource Manager Design - Post Revision - In Production
+<img src="https://github.com/johnpatek/ICEngine/blob/master/umlbyjordan.jpg" width="400"> 
+<img src="https://github.com/johnpatek/ICEngine/blob/master/ICE_ResourceManager_UML.jpg" width="400">
 
 ---------------------------------------------------------------------------------------------------------
 #### Authors / Responsibilities Currently
