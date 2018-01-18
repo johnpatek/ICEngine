@@ -41,8 +41,10 @@ CURRENT STANDING
 #### Architecture / Designs
 ---------------------------------------------------------------------------------------------------------
 
-###### Original Engine Architecture Design - In Process of Revision ###### Original Resource Manager Design - Post Revision - In Production
+###### Original Engine Architecture Design - In Process of Revision
 <img src="https://github.com/johnpatek/ICEngine/blob/master/umlbyjordan.jpg" width="400"> 
+
+###### Original Resource Manager Design - Post Revision - In Production
 <img src="https://github.com/johnpatek/ICEngine/blob/master/ICE_ResourceManager_UML.jpg" width="400">
 
 ---------------------------------------------------------------------------------------------------------
