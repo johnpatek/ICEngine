@@ -15,6 +15,7 @@ PURPOSE
 ###### - Reduce Data Dependency
 ###### - Keep the Engine running at all times, fast iteration
 ###### - Keep high performance data small and contiguous to fit in data caches
+###### - Multi-API Rendering using Vulkan and DirectX
 ###### - Multicore Utilization using Job-System of worker threads, one for main game thread, others for systems
 ###### - Handle-table Object System for fast and reliable indexing and usage of game / system objects
 ###### - Memory Manager using Pool Allocation with Fragmentation Protection to see allocation patterns / tailer code for optimization
@@ -25,10 +26,11 @@ CURRENT STANDING
 
 ###### Sprint 1 - Setup / Design
 - [x] Initial Engine Architecture Design
-- [ ] Resource Manager Design / Skeleton / Setup
+- [x] Resource Manager Design / Skeleton / Setup
 - [x] Memory Manager Design / Implementation
-- [ ] Systems Manager / Managers Base Setup
+- [x] Systems Manager / Managers Base Setup
 - [x] Vulkan API Base Foundation Setup
+- [x] Vulkan 3D Model Renderer Complete
 - [x] Object Handle-table Design
 - [ ] Object Handle-table Implementation
 
