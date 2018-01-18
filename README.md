@@ -41,6 +41,16 @@ CURRENT STANDING
 #### Authors / Responsibilities Currently
 ---------------------------------------------------------------------------------------------------------
 
+###### Original Engine Architecture Design - In Process of Revision
+![alt text](https://github.com/johnpatek/ICEngine/blob/master/umlbyjordan.jpg)
+
+###### Original Resource Manager Design - Post Revision - In Production
+![alt text](https://github.com/johnpatek/ICEngine/blob/master/ICE_ResourceManager_UML.jpg)
+
+---------------------------------------------------------------------------------------------------------
+#### Authors / Responsibilities Currently
+---------------------------------------------------------------------------------------------------------
+
 ###### Jordan Humphrey
 
 * ###### Engine Architecture Design
