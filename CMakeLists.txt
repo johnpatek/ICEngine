@@ -40,13 +40,12 @@ endif()
 
 target_link_libraries (
     server
+    ${ENGINE_CORE}
     ${THREADS}
-    uv 
+    uv
     ssl 
     uWS 
-    crypto 
-    SDL2 
-    ${THREADS}
+    crypto
     ${ZLIB_LIBRARY})
 
 add_executable(client client.cpp)
@@ -57,12 +56,10 @@ target_include_directories(client PUBLIC ${ZLIB_INCLUDE_DIRS})
 
 target_link_libraries (
     client
+    ${ENGINE_CORE}
     ${THREADS}
     curl 
-    curlpp 
     ssl 
-    crypto 
-    SDL2 
-    ${ZLIB_LIBRARY}
-    ${ENGINE_CORE})
+    crypto
+    ${ZLIB_LIBRARY})
 
