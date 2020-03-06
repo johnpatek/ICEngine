@@ -2,18 +2,15 @@ cmake_minimum_required(VERSION 3.0)
 
 project(ice-engine)
 
-find_package(OpenSSL REQUIRED)
-find_package(ZLIB REQUIRED)
-
 SET(CMAKE_CXX_FLAGS  "-std=c++14")
 
-set(3RDPARTY ../ice-engine-3rdparty/install)
+set(3RDPARTY ../ice-engine-3rdparty/build/install)
 
 set(3RDPARTY_INCLUDE ${3RDPARTY}/include)
 
 set(3RDPARTY_LIB ${3RDPARTY}/lib)
 
-set(CORE ../ice-engine-core/install)
+set(CORE ../ice-engine-core/build/install)
 
 set(CORE_INCLUDE ${CORE}/include)
 
@@ -42,11 +39,9 @@ target_link_libraries (
     server
     ${ENGINE_CORE}
     ${THREADS}
-    uv
-    ssl 
-    uWS 
-    crypto
-    ${ZLIB_LIBRARY})
+    uWS
+    ssl
+    crypto)
 
 add_executable(client client.cpp)
 
@@ -58,8 +53,6 @@ target_link_libraries (
     client
     ${ENGINE_CORE}
     ${THREADS}
-    curl 
-    ssl 
+    ssl
     crypto
-    ${ZLIB_LIBRARY})
-
+    curl)

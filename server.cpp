@@ -24,7 +24,9 @@ public:
         const ice::core::size_type size)
     {
         return ice::core::string_type(
-            "POST " + path + " ok");
+            "POST " + path + " ok: " + std::string(
+                (char*)data,
+                size));
     }
 };
 
