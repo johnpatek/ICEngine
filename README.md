@@ -9,3 +9,8 @@ framework.
 
 ## How to build
 
+First, build the common dependencies:
+
+"""bat
+build_common.bat
+"""

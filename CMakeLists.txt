@@ -2,57 +2,55 @@ cmake_minimum_required(VERSION 3.0)
 
 project(ice-engine)
 
-SET(CMAKE_CXX_FLAGS  "-std=c++14")
-
-set(3RDPARTY ../ice-engine-3rdparty/build/install)
-
-set(3RDPARTY_INCLUDE ${3RDPARTY}/include)
-
-set(3RDPARTY_LIB ${3RDPARTY}/lib)
-
-set(CORE ../ice-engine-core/build/install)
-
-set(CORE_INCLUDE ${CORE}/include)
-
-set(CORE_LIB ${CORE}/lib)
-
-find_library(ENGINE_CORE NAMES ice-engine-core HINTS ${CORE_LIB})
-
-set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/install)
-
-include_directories(include ${3RDPARTY_INCLUDE} ${CORE_INCLUDE})
-link_directories(${3RDPARTY_LIB} ${CORE_LIB})
-
-add_executable(server server.cpp)
-
-target_include_directories(server PUBLIC ${3RDPARTY_INCLUDE})
-target_include_directories(server PUBLIC ${CORE_INCLUDE})
-target_include_directories(server PUBLIC ${ZLIB_INCLUDE_DIRS})
+set(CMAKE_CXX_FLAGS  "-std=c++14")
 
 if(WIN32)
-    set(THREADS "")
+    set(PTHREAD "")
+    set(SSL_LIB_NAME libssl-1_1-x64.lib)
+    set(CRYPTO_LIB_NAME libcrypto-1_1-x64.lib)
 else()
-    set(THREADS pthread)
-endif()
+    set(PTHREAD pthread)
+    set(SSL_LIB_NAME ssl)
+    set(CRYPTO_LIB_NAME crypto)
+endif(WIN32)
 
-target_link_libraries (
-    server
-    ${ENGINE_CORE}
-    ${THREADS}
-    uWS
-    ssl
-    crypto)
+set(OPENSSL_USE_STATIC_LIBS TRUE)
 
-add_executable(client client.cpp)
+set(COMMON_ROOT ${CMAKE_SOURCE_DIR}/common/build/install)
 
-target_include_directories(client PUBLIC ${3RDPARTY_INCLUDE})
-target_include_directories(client PUBLIC ${CORE_INCLUDE})
-target_include_directories(client PUBLIC ${ZLIB_INCLUDE_DIRS})
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
 
-target_link_libraries (
-    client
-    ${ENGINE_CORE}
-    ${THREADS}
-    ssl
-    crypto
-    curl)
+set(COMMON_INCLUDE ${COMMON_ROOT}/include)
+
+set(COMMON_LIB ${COMMON_ROOT}/lib)
+
+include_directories(include ${COMMON_INCLUDE})
+
+file(GLOB ENGINE_SOURCES
+    "include/ice-engine/*.h"    
+    "src/ice-engine/*.cpp")
+
+add_library(
+    ice-engine-sdk 
+    SHARED 
+    ${ENGINE_SOURCES})
+
+target_include_directories(
+    ice-engine-sdk 
+    PUBLIC 
+    include 
+    ${COMMON_INCLUDE})
+
+target_link_libraries(
+    ice-engine-sdk 
+    PUBLIC
+    SDL2_static
+    ${PTHREAD}
+    ${SSL_LIB_NAME}
+    ${CRYPTO_LIB_NAME})
+
+file(GLOB ENGINE_SOURCES
+    "include/ice-engine/*.h"
+    "test/*.cpp")
+
+add_executable(unittest)

@@ -1,3 +1,6 @@
 [submodule "common/sdl2"]
 	path = common/sdl2
 	url = https://github.com/johnpatek/sdl2.git
+[submodule "common/openssl-cmake"]
+	path = common/openssl-cmake
+	url = https://github.com/janbar/openssl-cmake
