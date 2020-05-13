@@ -42,9 +42,9 @@ namespace ice
             const std::string& cert_file, 
             const std::string& key_file);
         
-        ~ssl_context();
+        ~ssl_context() = default;
 
-        void * data();
+        void * data() const;
     };
 
     class ssl_socket
@@ -60,7 +60,7 @@ namespace ice
 
         ssl_socket(ssl_socket&& s) = default;
 
-        ~ssl_socket();
+        ~ssl_socket() = default;
 
         int32_t read(
             uint8_t * const data, 

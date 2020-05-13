@@ -30,6 +30,18 @@ static SSL_CTX * init_ctx(int peer_type)
     return ctx;
 }
 
+static SSL * init_ssl(
+    const ice::ssl_context & ctx, 
+    ice::native_soket_t desc)
+{
+    SSL * ssl;
+    ssl = SSL_new(
+        static_cast<SSL_CTX*>(
+            ctx.data()));
+    SSL_set_fd(ssl,desc);
+    return ssl;
+}
+
 static void ssl_context_deleter(SSL_CTX * ctx)
 {
     SSL_CTX_free(ctx);
@@ -68,4 +80,13 @@ ice::ssl_context::ssl_context(
         _ctx.get(),
         key_file.c_str(),
         SSL_FILETYPE_PEM);
+}
+
+ice::ssl_socket::ssl_socket(
+    const ice::ssl_context & ctx, 
+    ice::native_soket_t desc)
+{
+    _ssl = std::make_shared<SSL>(
+        init_ssl(ctx,desc),
+        ssl_deleter);
 }
