@@ -2,7 +2,6 @@
 #define NETWORK_H
 #include <string>
 #include <memory>
-#include <openssl/ssl.h>
 #if defined(_WIN32)
 #include <Winsock2.h>
 #include <ws2tcpip.h>
@@ -29,11 +28,11 @@ namespace ice
         CLIENT_SOCKET,
         SERVER_SOCKET
     };
-
+    
     class ssl_context
     {
     private:
-        std::shared_ptr<SSL_CTX> _ctx;
+        std::shared_ptr<void> _ctx;
     public:
         ssl_context(int peer_type);
         
@@ -46,11 +45,11 @@ namespace ice
 
         void * data() const;
     };
-
+    
     class ssl_socket
     {
     private:
-        std::shared_ptr<SSL> _ssl;
+        std::shared_ptr<void> _ssl;
     public:
         ssl_socket(
              const ssl_context & ctx, 
@@ -71,5 +70,4 @@ namespace ice
             uint32_t size);
     };
 }
-
 #endif
