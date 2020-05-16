@@ -23,8 +23,8 @@ if(WIN32)
 else()
     set(CMAKE_CXX_FLAGS  "-std=c++14")
     set(PTHREAD pthread)
-    set(SSL_LIB_NAME ssl)
-    set(CRYPTO_LIB_NAME crypto)
+    find_library(SSL_LIB_NAME libssl.a PATHS ${COMMON_LIB})
+    find_library(CRYPTO_LIB_NAME libcrypto.a PATHS ${COMMON_LIB})
 endif(WIN32)
 
 file(GLOB ENGINE_SOURCES
@@ -33,7 +33,7 @@ file(GLOB ENGINE_SOURCES
 
 add_library(
     ice-engine-sdk 
-    SHARED 
+    STATIC 
     ${ENGINE_SOURCES})
 
 target_include_directories(
