@@ -12,12 +12,12 @@ static void * init_ctx(int peer_type)
     if(peer_type == ice::CLIENT_SOCKET)
     {
         method = const_cast<SSL_METHOD*>(
-            TLSv1_2_client_method());
+            TLS_client_method());
     }
     else if(peer_type == ice::SERVER_SOCKET)
     {
         method = const_cast<SSL_METHOD*>(
-            TLSv1_2_server_method());
+            TLS_server_method());
     }
     else
     {

@@ -33,7 +33,7 @@ file(GLOB ENGINE_SOURCES
 
 add_library(
     ice-engine-sdk 
-    STATIC 
+    SHARED
     ${ENGINE_SOURCES})
 
 target_include_directories(
