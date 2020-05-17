@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 project(ice-engine)
 
+SET(CMAKE_BUILD_TYPE Release)
+
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 
 set(COMMON_ROOT ${CMAKE_SOURCE_DIR}/common/build/install)
@@ -46,6 +48,51 @@ target_link_libraries(
     ice-engine-sdk 
     PUBLIC
     #SDL2_staticd
+    ${PTHREAD}
+    ${SSL_LIB_NAME}
+    ${CRYPTO_LIB_NAME})
+
+file(GLOB CLIENT_SOURCES
+    "include/ice-engine/*.h"    
+    "src/ice-engine/*.cpp"
+    "test/ice-engine/client.cpp")
+
+add_executable(
+    client
+    ${CLIENT_SOURCES})
+
+target_include_directories(
+    client
+    PUBLIC 
+    ${PROJ_INCLUDE}
+    ${COMMON_INCLUDE})
+
+target_link_libraries(
+    client 
+    PUBLIC
+    ${PTHREAD}
+    ${SSL_LIB_NAME}
+    ${CRYPTO_LIB_NAME})
+
+
+file(GLOB SERVER_SOURCES
+    "include/ice-engine/*.h"    
+    "src/ice-engine/*.cpp"
+    "test/ice-engine/server.cpp")
+
+add_executable(
+    server
+    ${SERVER_SOURCES})
+
+target_include_directories(
+    server
+    PUBLIC 
+    ${PROJ_INCLUDE}
+    ${COMMON_INCLUDE})
+
+target_link_libraries(
+    server 
+    PUBLIC
     ${PTHREAD}
     ${SSL_LIB_NAME}
     ${CRYPTO_LIB_NAME})
