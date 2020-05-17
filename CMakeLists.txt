@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(ice-engine)
-
-SET(CMAKE_BUILD_TYPE Release)
+project(ice-engine C CXX)
 
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 
@@ -35,7 +33,7 @@ file(GLOB ENGINE_SOURCES
 
 add_library(
     ice-engine-sdk 
-    SHARED
+    STATIC
     ${ENGINE_SOURCES})
 
 target_include_directories(
@@ -47,19 +45,19 @@ target_include_directories(
 target_link_libraries(
     ice-engine-sdk 
     PUBLIC
-    #SDL2_staticd
     ${PTHREAD}
     ${SSL_LIB_NAME}
     ${CRYPTO_LIB_NAME})
 
 file(GLOB CLIENT_SOURCES
-    "include/ice-engine/*.h"    
-    "src/ice-engine/*.cpp"
+    "include/ice-engine/*.h"
     "test/ice-engine/client.cpp")
 
 add_executable(
     client
     ${CLIENT_SOURCES})
+
+SET_TARGET_PROPERTIES(client PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(
     client
@@ -70,19 +68,19 @@ target_include_directories(
 target_link_libraries(
     client 
     PUBLIC
-    ${PTHREAD}
-    ${SSL_LIB_NAME}
-    ${CRYPTO_LIB_NAME})
+    ice-engine-sdk)
 
 
 file(GLOB SERVER_SOURCES
-    "include/ice-engine/*.h"    
-    "src/ice-engine/*.cpp"
+    "include/ice-engine/*.h"
     "test/ice-engine/server.cpp")
 
 add_executable(
     server
     ${SERVER_SOURCES})
+
+
+SET_TARGET_PROPERTIES(server PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(
     server
@@ -93,6 +91,4 @@ target_include_directories(
 target_link_libraries(
     server 
     PUBLIC
-    ${PTHREAD}
-    ${SSL_LIB_NAME}
-    ${CRYPTO_LIB_NAME})
+    ice-engine-sdk)
