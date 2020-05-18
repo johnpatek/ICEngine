@@ -33,10 +33,17 @@ file(GLOB ENGINE_SOURCES
     "include/ice-engine/*.h"    
     "src/ice-engine/*.cpp")
 
-add_library(
-    ice-engine-sdk 
-    SHARED
-    ${ENGINE_SOURCES})
+if(WIN32)
+    add_library(
+        ice-engine-sdk 
+        STATIC
+        ${ENGINE_SOURCES})
+else()
+    add_library(
+        ice-engine-sdk 
+        SHARED
+        ${ENGINE_SOURCES})
+endif()
 
 target_include_directories(
     ice-engine-sdk 
@@ -60,8 +67,6 @@ add_executable(
     client
     ${CLIENT_SOURCES})
 
-SET_TARGET_PROPERTIES(client PROPERTIES LINKER_LANGUAGE CXX)
-
 target_include_directories(
     client
     PUBLIC 
@@ -73,7 +78,6 @@ target_link_libraries(
     PUBLIC
     ice-engine-sdk)
 
-
 file(GLOB SERVER_SOURCES
     "include/ice-engine/*.h"
     "test/ice-engine/server.cpp")
@@ -81,9 +85,6 @@ file(GLOB SERVER_SOURCES
 add_executable(
     server
     ${SERVER_SOURCES})
-
-
-SET_TARGET_PROPERTIES(server PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(
     server

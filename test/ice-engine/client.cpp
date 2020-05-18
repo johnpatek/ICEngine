@@ -11,6 +11,12 @@ int main(const int argc, const char ** argv)
     const std::string msg = "Hello from the client";
     char msg_buf[100] = {0};
 
+    
+    #ifdef _WIN32
+        WSADATA wsaData;
+        WSAStartup(MAKEWORD(2, 2), &wsaData);
+    #endif
+
     sock = socket(PF_INET,SOCK_STREAM,0);
     
     addr.sin_family = AF_INET;
@@ -38,5 +44,9 @@ int main(const int argc, const char ** argv)
 
     std::cerr << "message from server: " << msg_buf << std::endl;
 
+    
+#ifdef _WIN32
+    WSACleanup();   
+#endif
     return 0;
 }

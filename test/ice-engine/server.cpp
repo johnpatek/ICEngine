@@ -12,7 +12,6 @@ void server(const int argc, const char ** argv)
     const std::string msg = "Hello from the server";
     char msg_buf[100] = {0};
 
-
     if(argc == 3)
     {
         cert_path = argv[1];
@@ -29,11 +28,14 @@ void server(const int argc, const char ** argv)
             throw std::runtime_error("Unable to create socket");
         }
 
+        
+    #ifndef _WIN32
         int enable = 1;
         if (setsockopt(srv, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
         {
             throw std::runtime_error("setsockopt error");
         }
+    #endif
 
         addr.sin_family = AF_INET;
         addr.sin_addr.s_addr = INADDR_ANY;
@@ -80,6 +82,11 @@ void server(const int argc, const char ** argv)
 
 int main(const int argc, const char ** argv)
 {
+#ifdef _WIN32
+    WSADATA wsaData;
+    WSAStartup(MAKEWORD(2, 2), &wsaData);
+#endif
+
     try
     {
         server(argc,argv);
@@ -88,6 +95,9 @@ int main(const int argc, const char ** argv)
     {
         std::cerr << e.what() << std::endl;
     }
-    
+
+#ifdef _WIN32
+    WSACleanup();   
+#endif
     return 0;
 }

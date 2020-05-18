@@ -1,5 +1,6 @@
 #ifndef NETWORK_H
 #define NETWORK_H
+#include "ice-engine/export.h"
 #include <string>
 #include <memory>
 #if defined(_WIN32)
@@ -34,16 +35,16 @@ namespace ice
     private:
         std::shared_ptr<void> _ctx;
     public:
-        ssl_context(int peer_type);
+        API_EXPORT ssl_context(int peer_type);
         
-        ssl_context(
+        API_EXPORT ssl_context(
             int peer_type, 
             const std::string& cert_file, 
             const std::string& key_file);
         
-        ~ssl_context() = default;
+        API_EXPORT ~ssl_context() = default;
 
-        void * data() const;
+        API_EXPORT void * data() const;
     };
     
     class ssl_socket
@@ -51,25 +52,25 @@ namespace ice
     private:
         std::shared_ptr<void> _ssl;
     public:
-        ssl_socket(
+        API_EXPORT ssl_socket(
              const ssl_context & ctx, 
              native_soket_t desc);
         
-        ssl_socket(const ssl_socket& s) = default;
+        API_EXPORT ssl_socket(const ssl_socket& s) = default;
 
-        ssl_socket(ssl_socket&& s) = default;
+        API_EXPORT ssl_socket(ssl_socket&& s) = default;
 
-        ~ssl_socket() = default;
+        API_EXPORT ~ssl_socket() = default;
 
-        void accept();
+        API_EXPORT void accept();
 
-        void connect();
+        API_EXPORT void connect();
 
-        int32_t read(
+        API_EXPORT int32_t read(
             uint8_t * const data, 
             uint32_t size);
 
-        int32_t write(
+        API_EXPORT int32_t write(
             const uint8_t * const data, 
             uint32_t size);
     };
