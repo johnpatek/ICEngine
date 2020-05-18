@@ -1,11 +1,13 @@
 #include "ice-engine/network.h"
 #include <openssl/ssl.h>
+#include <iostream>
 
 static void * init_ctx(int peer_type)
 {
     SSL_METHOD * method;
     SSL_CTX * ctx = NULL;
     
+    SSL_library_init();
     OpenSSL_add_all_algorithms();
     SSL_load_error_strings();
 
@@ -121,4 +123,14 @@ int32_t ice::ssl_socket::write(
         static_cast<SSL*>(_ssl.get()),
         data,
         size);
+}
+
+void ice::ssl_socket::accept()
+{
+    SSL_accept(static_cast<SSL*>(_ssl.get()));
+}
+
+void ice::ssl_socket::connect()
+{
+    SSL_connect(static_cast<SSL*>(_ssl.get()));
 }
