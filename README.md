@@ -7,17 +7,10 @@
 The purpose of this project is to provide a modern C++ application
 framework.
 
-## Build Instructions
+## How to build
 
-In order to build this repository, you will need to build its
-dependencies in the order they are listed:
+First, build the common dependencies:
 
-[ICEngine 3rdparty](https://github.com/johnpatek/ice-engine-3rdparty.git)\
-[ICEngine Core](https://github.com/johnpatek/ice-engine-core.git)
-
-Note that they must be built in the same location, so your directory
-structure will resemble the following:
-
-/home/john/repos/ice-engine-3rdparty\
-/home/john/repos/ice-engine-core\
-/home/john/repos/ICEngine
+"""bat
+build_common.bat
+"""
