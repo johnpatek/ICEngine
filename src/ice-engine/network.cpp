@@ -89,11 +89,6 @@ ice::ssl_context::ssl_context(
         static_cast<SSL_CTX*>(_ctx.get()),
         key_file.c_str(),
         SSL_FILETYPE_PEM);
-
-    if(!SSL_CTX_check_private_key(static_cast<SSL_CTX*>(_ctx.get())))
-    {
-        std::cerr << "bad key" << std::endl;
-    }
 }
 
 void * ice::ssl_context::data() const
@@ -108,16 +103,6 @@ ice::ssl_socket::ssl_socket(
     _ssl = std::shared_ptr<void>(
         init_ssl(ctx,desc),
         ssl_deleter);
-}
-
-static int32_t unix_read(int fd, void * buf, size_t size)
-{
-    return read(fd,buf,size);
-}
-
-static int32_t unix_write(int fd, const void * buf, size_t size)
-{
-    return write(fd,buf,size);
 }
 
 int32_t ice::ssl_socket::read(
