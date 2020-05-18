@@ -15,7 +15,7 @@ int main(const int argc, const char ** argv)
     
     addr.sin_family = AF_INET;
     inet_pton(AF_INET,"127.0.0.1",&addr.sin_addr.s_addr);
-    addr.sin_port = htons(35001);
+    addr.sin_port = htons(35000);
 
     connect(sock,reinterpret_cast<struct sockaddr*>(&addr),sizeof(addr));
 

@@ -4,3 +4,6 @@
 [submodule "common/openssl-cmake"]
 	path = common/openssl-cmake
 	url = https://github.com/johnpatek/openssl-cmake.git
+[submodule "common/json11"]
+	path = common/json11
+	url = https://github.com/johnpatek/json11

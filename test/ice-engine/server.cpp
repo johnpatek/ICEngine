@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstring>
 
-void serve(const int argc, const char ** argv)
+void server(const int argc, const char ** argv)
 {
     ice::native_soket_t srv,cli;
     struct sockaddr_in addr;
@@ -29,9 +29,15 @@ void serve(const int argc, const char ** argv)
             throw std::runtime_error("Unable to create socket");
         }
 
+        int enable = 1;
+        if (setsockopt(srv, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+        {
+            throw std::runtime_error("setsockopt error");
+        }
+
         addr.sin_family = AF_INET;
         addr.sin_addr.s_addr = INADDR_ANY;
-        addr.sin_port = htons(35001);
+        addr.sin_port = htons(35000);
 
         if(bind(srv,reinterpret_cast<struct sockaddr*>(&addr),sizeof(addr)) < 0)
         {
@@ -76,7 +82,7 @@ int main(const int argc, const char ** argv)
 {
     try
     {
-        serve(argc,argv);
+        server(argc,argv);
     }
     catch(const std::exception& e)
     {

@@ -7,7 +7,6 @@ static void * init_ctx(int peer_type)
     SSL_METHOD * method;
     SSL_CTX * ctx = NULL;
     
-    SSL_library_init();
     OpenSSL_add_all_algorithms();
     SSL_load_error_strings();
 
