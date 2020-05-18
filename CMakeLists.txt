@@ -20,11 +20,13 @@ if(WIN32)
     set(PTHREAD "")
     find_library(SSL_LIB_NAME libssl-1_1-x64.lib PATHS ${COMMON_LIB})
     find_library(CRYPTO_LIB_NAME libcrypto-1_1-x64.lib PATHS ${COMMON_LIB})
+    set(DL "")
 else()
     set(CMAKE_CXX_FLAGS  "-std=c++14")
     set(PTHREAD pthread)
     find_library(SSL_LIB_NAME libssl.a PATHS ${COMMON_LIB})
     find_library(CRYPTO_LIB_NAME libcrypto.a PATHS ${COMMON_LIB})
+    find_library(DL libdl.so PATHS /usr/lib/x86_64-linux-gnu/)
 endif(WIN32)
 
 file(GLOB ENGINE_SOURCES
@@ -33,7 +35,7 @@ file(GLOB ENGINE_SOURCES
 
 add_library(
     ice-engine-sdk 
-    STATIC
+    SHARED
     ${ENGINE_SOURCES})
 
 target_include_directories(
@@ -45,6 +47,7 @@ target_include_directories(
 target_link_libraries(
     ice-engine-sdk 
     PUBLIC
+    ${DL}
     ${PTHREAD}
     ${SSL_LIB_NAME}
     ${CRYPTO_LIB_NAME})

@@ -1,5 +1,6 @@
 #include "ice-engine/network.h"
 #include <iostream>
+#include <cstring>
 
 void serve(const int argc, const char ** argv)
 {
@@ -8,8 +9,8 @@ void serve(const int argc, const char ** argv)
     std::string cert_path, key_path;
     std::shared_ptr<ice::ssl_context> secure_context;
     std::shared_ptr<ice::ssl_socket> secure_socket;    
-    const char * const msg = "Hello from the server";
-    char msg_buf[100];
+    const std::string msg = "Hello from the server";
+    char msg_buf[100] = {0};
 
 
     if(argc == 3)
@@ -30,7 +31,7 @@ void serve(const int argc, const char ** argv)
 
         addr.sin_family = AF_INET;
         addr.sin_addr.s_addr = INADDR_ANY;
-        addr.sin_port = htons(35000);
+        addr.sin_port = htons(35001);
 
         if(bind(srv,reinterpret_cast<struct sockaddr*>(&addr),sizeof(addr)) < 0)
         {
@@ -51,13 +52,15 @@ void serve(const int argc, const char ** argv)
 
         secure_socket = std::make_shared<ice::ssl_socket>(*secure_context,cli);
         
-        secure_socket->read(reinterpret_cast<uint8_t* const>(msg_buf),100);
+        secure_socket->accept();
+
+        std::cerr << "Bytes read: " << secure_socket->read(reinterpret_cast<uint8_t* const>(msg_buf),100) << std::endl;
 
         std::cerr << "Message from client: " << msg_buf << std::endl;
 
-        secure_socket->write(
-            reinterpret_cast<const uint8_t* const>(msg),
-            static_cast<uint32_t>(strlen(msg) + 1));
+        std::cerr << "Bytes written: " << secure_socket->write(
+            reinterpret_cast<const uint8_t* const>(msg.data()),
+            static_cast<uint32_t>(msg.size())) << std::endl;
 
         std::cerr << "Server message sent" << std::endl;
 

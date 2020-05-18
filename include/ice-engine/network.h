@@ -61,6 +61,10 @@ namespace ice
 
         ~ssl_socket() = default;
 
+        void accept();
+
+        void connect();
+
         int32_t read(
             uint8_t * const data, 
             uint32_t size);
