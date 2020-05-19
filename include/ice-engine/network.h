@@ -35,16 +35,16 @@ namespace ice
     private:
         std::shared_ptr<void> _ctx;
     public:
-        API_EXPORT ssl_context(int peer_type);
+        ssl_context(int peer_type);
         
-        API_EXPORT ssl_context(
+        ssl_context(
             int peer_type, 
             const std::string& cert_file, 
             const std::string& key_file);
         
-        API_EXPORT ~ssl_context() = default;
+        ~ssl_context() = default;
 
-        API_EXPORT void * data() const;
+        void * data() const;
     };
     
     class ssl_socket
@@ -52,25 +52,25 @@ namespace ice
     private:
         std::shared_ptr<void> _ssl;
     public:
-        API_EXPORT ssl_socket(
+        ssl_socket(
              const ssl_context & ctx, 
              native_soket_t desc);
         
-        API_EXPORT ssl_socket(const ssl_socket& s) = default;
+        ssl_socket(const ssl_socket& s) = default;
 
-        API_EXPORT ssl_socket(ssl_socket&& s) = default;
+        ssl_socket(ssl_socket&& s) = default;
 
-        API_EXPORT ~ssl_socket() = default;
+        ~ssl_socket() = default;
 
-        API_EXPORT void accept();
+        void accept();
 
-        API_EXPORT void connect();
+        void connect();
 
-        API_EXPORT int32_t read(
+        int32_t read(
             uint8_t * const data, 
             uint32_t size);
 
-        API_EXPORT int32_t write(
+        int32_t write(
             const uint8_t * const data, 
             uint32_t size);
     };

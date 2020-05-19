@@ -1,6 +1,5 @@
 #include "ice-engine/network.h"
 #include <iostream>
-#include <cstring>
 
 void server(const int argc, const char ** argv)
 {
