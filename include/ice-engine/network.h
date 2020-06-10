@@ -1,6 +1,5 @@
 #ifndef NETWORK_H
 #define NETWORK_H
-#include "ice-engine/export.h"
 #include <string>
 #include <memory>
 #if defined(_WIN32)
