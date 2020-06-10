@@ -25,7 +25,7 @@ int main(const int argc, const char ** argv)
     connect(sock,reinterpret_cast<struct sockaddr*>(&addr),sizeof(addr));
 
     secure_context = std::make_shared<ice::ssl_context>(
-        ice::CLIENT_SOCKET);
+        ice::CLIENT_TCP_SOCKET);
 
     secure_socket = std::make_shared<ice::ssl_socket>(
         *secure_context,

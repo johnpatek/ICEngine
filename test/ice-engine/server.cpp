@@ -16,7 +16,7 @@ void server(const int argc, const char ** argv)
         cert_path = argv[1];
         key_path = argv[2];
         secure_context = std::make_shared<ice::ssl_context>(
-            ice::SERVER_SOCKET,
+            ice::SERVER_TCP_SOCKET,
             cert_path,
             key_path);
 
