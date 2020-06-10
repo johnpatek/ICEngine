@@ -65,6 +65,7 @@ static void ssl_deleter(void * ssl)
 {
     int fd;
     fd = SSL_get_fd(static_cast<SSL*>(ssl));
+    SSL_shutdown(static_cast<SSL*>(ssl));
 #ifdef _WIN32
     _close(fd);
 #else

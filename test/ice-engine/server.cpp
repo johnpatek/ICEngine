@@ -1,5 +1,6 @@
 #include "ice-engine/network.h"
 #include <iostream>
+#include <thread>
 
 void server(const int argc, const char ** argv)
 {
@@ -7,7 +8,7 @@ void server(const int argc, const char ** argv)
     struct sockaddr_in addr;
     std::string cert_path, key_path;
     std::shared_ptr<ice::ssl_context> secure_context;
-    const std::string msg = "Hello from the server";
+    const std::string msg = "Hello from the server\r\n";
     char msg_buf[100] = {0};
 
     srv = socket(PF_INET,SOCK_STREAM,0);
@@ -80,6 +81,8 @@ void server(const int argc, const char ** argv)
         std::cerr << "Server message sent" << std::endl;
     }
 
+    Sleep(5000);
+    
     #ifdef _WIN32
         _close(static_cast<int>(srv));
     #else
