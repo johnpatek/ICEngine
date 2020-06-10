@@ -32,19 +32,30 @@ int main(const int argc, const char ** argv)
 
     secure_socket->connect();
 
-    std::cerr << "Bytes written: " << secure_socket->write(
+    if(secure_socket->write(
         reinterpret_cast<const uint8_t* const>(msg.data()),
-        static_cast<uint32_t>(msg.size())) << std::endl;
+        static_cast<uint32_t>(msg.size())) < 0)
+    {
+        throw std::runtime_error("Unable to write to socket");
+    }
 
     std::cerr << "Client message sent" << std::endl;
     
-    std::cerr << "Bytes read: " << secure_socket->read(reinterpret_cast<uint8_t* const>(msg_buf),100) << std::endl;
+    if(secure_socket->read(
+        reinterpret_cast<uint8_t* const>(msg_buf),
+        100) < 0)
+    {
+        throw std::runtime_error("Unable to read from socket");
+    }
 
     std::cerr << "message from server: " << msg_buf << std::endl;
-    
+
+    std::cerr << "Hello" << std::endl;   
     #ifdef _WIN32
         WSACleanup();   
     #endif
+    
+    std::cerr << "Goodbye" << std::endl;
 
     return 0;
 }

@@ -7,20 +7,20 @@ void server(const int argc, const char ** argv)
     struct sockaddr_in addr;
     std::string cert_path, key_path;
     std::shared_ptr<ice::ssl_context> secure_context;
-    std::shared_ptr<ice::ssl_socket> secure_socket;    
     const std::string msg = "Hello from the server";
     char msg_buf[100] = {0};
 
+    srv = socket(PF_INET,SOCK_STREAM,0);
+
     if(argc == 3)
     {
+        std::shared_ptr<ice::ssl_socket> secure_socket;    
         cert_path = argv[1];
         key_path = argv[2];
         secure_context = std::make_shared<ice::ssl_context>(
             ice::SERVER_TCP_SOCKET,
             cert_path,
             key_path);
-
-        srv = socket(PF_INET,SOCK_STREAM,0);
 
         if(srv < 0)
         {
@@ -60,23 +60,31 @@ void server(const int argc, const char ** argv)
         secure_socket = std::make_shared<ice::ssl_socket>(*secure_context,cli);
         
         secure_socket->accept();
-
-        std::cerr << "Bytes read: " << secure_socket->read(reinterpret_cast<uint8_t* const>(msg_buf),100) << std::endl;
+        
+        if(secure_socket->read(
+            reinterpret_cast<uint8_t* const>(msg_buf),
+            100) < 0)
+        {
+            throw std::runtime_error("Unable to read from socket");
+        }
 
         std::cerr << "Message from client: " << msg_buf << std::endl;
 
-        std::cerr << "Bytes written: " << secure_socket->write(
+        if(secure_socket->write(
             reinterpret_cast<const uint8_t* const>(msg.data()),
-            static_cast<uint32_t>(msg.size())) << std::endl;
+            static_cast<uint32_t>(msg.size())) < 0)
+        {
+            throw std::runtime_error("Unable to write to socket");
+        }
 
         std::cerr << "Server message sent" << std::endl;
-
-        #ifdef _WIN32
-        _close(static_cast<int>(srv));
-        #else
-        close(srv);
-        #endif
     }
+
+    #ifdef _WIN32
+        _close(static_cast<int>(srv));
+    #else
+        close(srv);
+    #endif
 }
 
 int main(const int argc, const char ** argv)
