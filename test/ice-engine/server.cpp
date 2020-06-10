@@ -3,7 +3,7 @@
 
 void server(const int argc, const char ** argv)
 {
-    ice::native_soket_t srv,cli;
+    ice::native_socket_t srv,cli;
     struct sockaddr_in addr;
     std::string cert_path, key_path;
     std::shared_ptr<ice::ssl_context> secure_context;

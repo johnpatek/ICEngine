@@ -19,9 +19,9 @@
 namespace ice
 {
 #if defined(_WIN32)
-    typedef SOCKET native_soket_t;
+    typedef SOCKET native_socket_t;
 #else
-    typedef int32_t native_soket_t;
+    typedef int32_t native_socket_t;
 #endif
     enum peer_types
     {
@@ -55,7 +55,7 @@ namespace ice
     public:
         ssl_socket(
              const ssl_context & ctx, 
-             native_soket_t desc);
+             native_socket_t desc);
         
         ssl_socket(const ssl_socket& s) = default;
 

@@ -44,7 +44,7 @@ static void * init_ctx(int peer_type)
 
 static void * init_ssl(
     const ice::ssl_context & ctx, 
-    ice::native_soket_t desc)
+    ice::native_socket_t desc)
 {
     SSL * ssl;
     ssl = SSL_new(
@@ -107,7 +107,7 @@ void * ice::ssl_context::data() const
 
 ice::ssl_socket::ssl_socket(
     const ice::ssl_context & ctx, 
-    ice::native_soket_t desc)
+    ice::native_socket_t desc)
 {
     _ssl = std::shared_ptr<void>(
         init_ssl(ctx,desc),

@@ -3,14 +3,13 @@
 
 int main(const int argc, const char ** argv)
 {
-    ice::native_soket_t sock;
+    ice::native_socket_t sock;
     struct sockaddr_in addr;
     std::shared_ptr<ice::ssl_context> secure_context;
     std::shared_ptr<ice::ssl_socket> secure_socket;
     const std::string msg = "Hello from the client";
     char msg_buf[100] = {0};
 
-    
     #ifdef _WIN32
         WSADATA wsaData;
         WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -42,10 +41,10 @@ int main(const int argc, const char ** argv)
     std::cerr << "Bytes read: " << secure_socket->read(reinterpret_cast<uint8_t* const>(msg_buf),100) << std::endl;
 
     std::cerr << "message from server: " << msg_buf << std::endl;
-
     
-#ifdef _WIN32
-    WSACleanup();   
-#endif
+    #ifdef _WIN32
+        WSACleanup();   
+    #endif
+
     return 0;
 }
