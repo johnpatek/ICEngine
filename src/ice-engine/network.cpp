@@ -10,15 +10,25 @@ static void * init_ctx(int peer_type)
     OpenSSL_add_all_algorithms();
     SSL_load_error_strings();
 
-    if(peer_type == ice::CLIENT_SOCKET)
+    if(peer_type == ice::CLIENT_TCP_SOCKET)
     {
         method = const_cast<SSL_METHOD*>(
             TLS_client_method());
     }
-    else if(peer_type == ice::SERVER_SOCKET)
+    else if(peer_type == ice::SERVER_TCP_SOCKET)
     {
         method = const_cast<SSL_METHOD*>(
             TLS_server_method());
+    }
+    else if(peer_type == ice::CLIENT_UDP_SOCKET)
+    {
+        method = const_cast<SSL_METHOD*>(
+            DTLS_client_method());
+    }
+    else if(peer_type == ice::SERVER_UDP_SOCKET)
+    {
+        method = const_cast<SSL_METHOD*>(
+            DTLS_server_method());
     }
     else
     {

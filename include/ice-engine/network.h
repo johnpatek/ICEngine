@@ -25,8 +25,10 @@ namespace ice
 #endif
     enum peer_types
     {
-        CLIENT_SOCKET,
-        SERVER_SOCKET
+        CLIENT_TCP_SOCKET,
+        SERVER_TCP_SOCKET,
+        CLIENT_UDP_SOCKET,
+        SERVER_UDP_SOCKET
     };
     
     class ssl_context
