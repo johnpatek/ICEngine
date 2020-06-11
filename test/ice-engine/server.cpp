@@ -1,97 +1,25 @@
+#include "ice-engine/argparse.h"
 #include "ice-engine/network.h"
 #include <iostream>
 #include <thread>
+#include <array>
 
-void server(const int argc, const char ** argv)
-{
-    ice::native_socket_t srv,cli;
-    struct sockaddr_in addr;
-    std::string cert_path, key_path;
-    std::shared_ptr<ice::ssl_context> secure_context;
-    const std::string msg = "Hello from the server\r\n";
-    char msg_buf[100] = {0};
+void server_main(
+    const std::string cert_path, 
+    const std::string key_path, 
+    const int port);
 
-    srv = socket(PF_INET,SOCK_STREAM,0);
-
-    if(argc == 3)
-    {
-        std::shared_ptr<ice::ssl_socket> secure_socket;    
-        cert_path = argv[1];
-        key_path = argv[2];
-        secure_context = std::make_shared<ice::ssl_context>(
-            ice::SERVER_TCP_SOCKET,
-            cert_path,
-            key_path);
-
-        if(srv < 0)
-        {
-            throw std::runtime_error("Unable to create socket");
-        }
-
-        
-    #ifndef _WIN32
-        int enable = 1;
-        if (setsockopt(srv, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
-        {
-            throw std::runtime_error("setsockopt error");
-        }
-    #endif
-
-        addr.sin_family = AF_INET;
-        addr.sin_addr.s_addr = INADDR_ANY;
-        addr.sin_port = htons(35000);
-
-        if(bind(srv,reinterpret_cast<struct sockaddr*>(&addr),sizeof(addr)) < 0)
-        {
-            throw std::runtime_error("Unable to bind socket");    
-        }
-
-        if(listen(srv,3) < 0)
-        {
-            throw std::runtime_error("Unable to listen");
-        }
-
-        cli = accept(srv,nullptr,nullptr);
-
-        if(cli < 0)
-        {
-            throw std::runtime_error("Unable to accept");    
-        }
-
-        secure_socket = std::make_shared<ice::ssl_socket>(*secure_context,cli);
-        
-        secure_socket->accept();
-        
-        if(secure_socket->read(
-            reinterpret_cast<uint8_t* const>(msg_buf),
-            100) < 0)
-        {
-            throw std::runtime_error("Unable to read from socket");
-        }
-
-        std::cerr << "Message from client: " << msg_buf << std::endl;
-
-        if(secure_socket->write(
-            reinterpret_cast<const uint8_t* const>(msg.data()),
-            static_cast<uint32_t>(msg.size())) < 0)
-        {
-            throw std::runtime_error("Unable to write to socket");
-        }
-
-        std::cerr << "Server message sent" << std::endl;
-    }
-
-    Sleep(5000);
-    
-    #ifdef _WIN32
-        _close(static_cast<int>(srv));
-    #else
-        close(srv);
-    #endif
-}
+void process_request(
+    ice::ssl_context& ctx,
+    const ice::native_socket_t desc);
 
 int main(const int argc, const char ** argv)
 {
+    argparse::ArgumentParser parser("server","An example server app.");
+    parser.add_argument("-p","--port","port",true);
+    parser.add_argument("-c","--cert","cert",true);
+    parser.add_argument("-k","--key","key",true);
+    parser.enable_help();
 #ifdef _WIN32
     WSADATA wsaData;
     WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -99,7 +27,14 @@ int main(const int argc, const char ** argv)
 
     try
     {
-        server(argc,argv);
+        auto error = parser.parse(argc, argv);
+        if(!error)
+        {
+            server_main(
+                parser.get<std::string>("cert"),
+                parser.get<std::string>("key"),
+                parser.get<int>("port"));
+        }
     }
     catch(const std::exception& e)
     {
@@ -110,4 +45,41 @@ int main(const int argc, const char ** argv)
     WSACleanup();   
 #endif
     return 0;
+}
+
+const uint32_t BUF_SIZE = 1024;
+const std::string reply = "Message from server";
+
+void server_main(
+    const std::string cert_path, 
+    const std::string key_path, 
+    const int port)
+{
+    ice::native_socket_t srv;
+    std::vector<std::thread> threads;
+    ice::ssl_context ctx(
+        ice::SERVER_TCP_SOCKET,
+        cert_path,
+        key_path);
+    
+    threads.push_back(std::thread([&ctx,&srv]
+    {
+        ice::native_socket_t con;
+        con = accept(srv,nullptr,nullptr);
+        while(con != -1)
+        {
+            process_request(ctx,con);
+            con = accept(srv,nullptr,nullptr);
+        }
+    }));
+
+}
+
+void process_request(
+    ice::ssl_context& ctx,
+    const ice::native_socket_t desc)
+{
+    ice::ssl_socket sock(ctx,desc);
+    sock.accept();
+    
 }
