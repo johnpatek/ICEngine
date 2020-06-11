@@ -3,11 +3,30 @@
 #include <iostream>
 #include <thread>
 #include <array>
+#include <mutex>
+
+const uint32_t BUF_SIZE = 1024;
+const std::string reply = "Message from server\r\n";
+bool run;
+
+#ifdef _WIN32
+BOOL WINAPI signal_handler(DWORD signal) {
+
+    if (signal == CTRL_C_EVENT)
+    {
+        run = false;
+    }
+    return TRUE;
+}
+#else
+
+#endif
 
 void server_main(
     const std::string cert_path, 
     const std::string key_path, 
-    const int port);
+    const int port,
+    const int threads);
 
 void process_request(
     ice::ssl_context& ctx,
@@ -15,10 +34,13 @@ void process_request(
 
 int main(const int argc, const char ** argv)
 {
+    run = true;
+    int threads = std::thread::hardware_concurrency();
     argparse::ArgumentParser parser("server","An example server app.");
     parser.add_argument("-p","--port","port",true);
     parser.add_argument("-c","--cert","cert",true);
     parser.add_argument("-k","--key","key",true);
+    parser.add_argument("-t","--threads","threads",false);
     parser.enable_help();
 #ifdef _WIN32
     WSADATA wsaData;
@@ -30,10 +52,27 @@ int main(const int argc, const char ** argv)
         auto error = parser.parse(argc, argv);
         if(!error)
         {
-            server_main(
-                parser.get<std::string>("cert"),
-                parser.get<std::string>("key"),
-                parser.get<int>("port"));
+            if(parser.exists("threads"))
+            {
+                parser.get<int>("threads");
+            }
+
+        #ifdef _WIN32
+            if (SetConsoleCtrlHandler(signal_handler, TRUE)) 
+            {
+        #else
+
+        #endif
+                server_main(
+                    parser.get<std::string>("cert"),
+                    parser.get<std::string>("key"),
+                    parser.get<int>("port"),
+                    threads);
+            }
+        }
+        else
+        {
+            parser.print_help();
         }
     }
     catch(const std::exception& e)
@@ -47,39 +86,138 @@ int main(const int argc, const char ** argv)
     return 0;
 }
 
-const uint32_t BUF_SIZE = 1024;
-const std::string reply = "Message from server";
-
 void server_main(
     const std::string cert_path, 
     const std::string key_path, 
-    const int port)
+    const int port,
+    const int threads)
 {
     ice::native_socket_t srv;
-    std::vector<std::thread> threads;
+    struct sockaddr_in addr;
+    std::vector<std::thread> server_threads;
     ice::ssl_context ctx(
         ice::SERVER_TCP_SOCKET,
         cert_path,
         key_path);
-    
-    threads.push_back(std::thread([&ctx,&srv]
-    {
-        ice::native_socket_t con;
-        con = accept(srv,nullptr,nullptr);
-        while(con != -1)
-        {
-            process_request(ctx,con);
-            con = accept(srv,nullptr,nullptr);
-        }
-    }));
 
+    srv = socket(PF_INET,SOCK_STREAM,0);
+
+    if(srv < 0)
+    {
+        throw std::runtime_error("Unable to create socket");
+    }
+
+    int enable = 1;
+#ifdef _WIN32
+    // TODO: Figure it out
+#else 
+    if (setsockopt(srv, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int)) < 0)
+    {
+        throw std::runtime_error("setsockopt error");
+    }
+#endif
+
+    if(srv < 0)
+    {
+        throw std::runtime_error("Unable to set socket options");
+    }
+
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_port = htons(port);
+    
+    if(bind(srv,reinterpret_cast<struct sockaddr*>(&addr),sizeof(addr)) < 0)
+    {
+        throw std::runtime_error("Unable to bind socket");    
+    }
+
+    if(listen(srv,3) < 0)
+    {
+        throw std::runtime_error("Unable to listen");
+    }
+
+    while(server_threads.size() < threads)
+    {
+        server_threads.push_back(std::thread([&ctx,&srv]
+        {
+            bool loop(true);
+            ice::native_socket_t con;
+            while(loop)
+            {
+                con = accept(srv,nullptr,nullptr);
+                if(con > 0)
+                {
+                    std::cerr << "1" << std::endl;
+                    process_request(ctx,con);
+                    std::cerr << "2" << std::endl;
+                }
+                else
+                {
+                    loop = false;
+                }
+                std::cerr << "3" << std::endl;
+            }
+        }));
+    }
+
+    while(run)
+    {
+        std::this_thread::yield();
+    }
+
+#ifdef _WIN32
+    _close(static_cast<int>(srv));
+#else
+    close(srv);
+#endif
+
+    for(auto& server_thread : server_threads)
+    {
+        server_thread.join();
+    }
 }
+
+std::mutex mtx;
 
 void process_request(
     ice::ssl_context& ctx,
     const ice::native_socket_t desc)
 {
+    std::cerr << "a" << std::endl;
+    uint32_t read_size,write_size;
+    std::array<uint8_t,BUF_SIZE> buffer;
     ice::ssl_socket sock(ctx,desc);
-    sock.accept();
     
+    sock.accept();
+
+    read_size = sock.read(
+        buffer.data(),
+        static_cast<uint32_t>(buffer.size()));
+    std::cerr << "b" << std::endl;
+    
+    if(read_size < 0)
+    {
+        throw std::runtime_error("Unable to read from socket");
+    }
+    else
+    {
+        std::unique_lock<std::mutex> lock(mtx);
+        std::cerr.write(
+            reinterpret_cast<const char*>(
+                buffer.data()),
+            read_size);
+        std::cerr << std::endl;
+    }
+    std::cerr << "c" << std::endl;
+    
+    write_size = sock.write(
+        reinterpret_cast<const uint8_t* const>(
+            reply.data()),
+        static_cast<uint32_t>(reply.size()));
+    std::cerr << "d" << std::endl;
+
+    if(write_size < 0)
+    {
+        throw std::runtime_error("Unable to write to socket");
+    }
 }
