@@ -4,6 +4,10 @@
 #include <thread>
 #include <array>
 #include <mutex>
+#include <signal.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 
 const uint32_t BUF_SIZE = 1024;
 const std::string reply = "Message from server\r\n";
@@ -19,7 +23,10 @@ BOOL WINAPI signal_handler(DWORD signal) {
     return TRUE;
 }
 #else
-
+void signal_handler(int s)
+{
+    run = false;
+}
 #endif
 
 void server_main(
@@ -61,7 +68,12 @@ int main(const int argc, const char ** argv)
             if (SetConsoleCtrlHandler(signal_handler, TRUE)) 
             {
         #else
-
+            struct sigaction sigIntHandler;
+            sigIntHandler.sa_handler = signal_handler;
+            sigemptyset(&sigIntHandler.sa_mask);
+            sigIntHandler.sa_flags = 0;
+            if(sigaction(SIGINT, &sigIntHandler, NULL) == 0)
+            {
         #endif
                 server_main(
                     parser.get<std::string>("cert"),

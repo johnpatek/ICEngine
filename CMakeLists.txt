@@ -24,7 +24,9 @@ if(WIN32)
     set(DL "")
 else()
     set(CMAKE_CXX_FLAGS  "-std=c++14")
-    set(PTHREAD pthread)
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)    
+    set(PTHREAD Threads::Threads)
     find_library(SSL_LIB_NAME libssl.a PATHS ${COMMON_LIB})
     find_library(CRYPTO_LIB_NAME libcrypto.a PATHS ${COMMON_LIB})
     # find_library(SDL2_LIB_NAME SDL2_staticd.a PATHS ${COMMON_LIB})
@@ -78,7 +80,8 @@ target_include_directories(
 target_link_libraries(
     client 
     PUBLIC
-    ice-engine-sdk)
+    ice-engine-sdk
+    ${PTHREAD})
 
 file(GLOB SERVER_SOURCES
     "include/ice-engine/*.h"
@@ -97,4 +100,5 @@ target_include_directories(
 target_link_libraries(
     server 
     PUBLIC
-    ice-engine-sdk)
+    ice-engine-sdk
+    ${PTHREAD})
