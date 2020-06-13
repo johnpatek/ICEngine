@@ -2,11 +2,12 @@
 #define NETWORK_H
 #include <string>
 #include <memory>
+#include <iostream>
 #if defined(_WIN32)
 #include <Winsock2.h>
 #include <ws2tcpip.h>
 #include <io.h>
-#pragma comment(lib,"Ws2_32.lib")
+#pragma  comment(lib, "ws2_32.lib ")
 #else /* Unix */
 #include <arpa/inet.h> 
 #include <sys/types.h>
@@ -43,6 +44,10 @@ namespace ice
             const std::string& cert_file, 
             const std::string& key_file);
         
+        ssl_context(const ssl_context& o) = default;
+
+        ssl_context(ssl_context&& o) = default;
+
         ~ssl_context() = default;
 
         void * data() const;

@@ -7,7 +7,9 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <stdio.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 const uint32_t BUF_SIZE = 1024;
 const std::string reply = "Message from server\r\n";
@@ -159,15 +161,12 @@ void server_main(
                 con = accept(srv,nullptr,nullptr);
                 if(con > 0)
                 {
-                    std::cerr << "1" << std::endl;
                     process_request(ctx,con);
-                    std::cerr << "2" << std::endl;
                 }
                 else
                 {
                     loop = false;
                 }
-                std::cerr << "3" << std::endl;
             }
         }));
     }
@@ -178,7 +177,7 @@ void server_main(
     }
 
 #ifdef _WIN32
-    _close(static_cast<int>(srv));
+    closesocket(srv);
 #else
     close(srv);
 #endif
