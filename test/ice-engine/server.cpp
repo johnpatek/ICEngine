@@ -16,8 +16,9 @@ const std::string reply = "Message from server\r\n";
 bool run;
 
 #ifdef _WIN32
-BOOL WINAPI signal_handler(DWORD signal) {
-
+BOOL WINAPI signal_handler(DWORD signal) 
+{
+    std::cerr << "ctrl-c" << std::endl;
     if (signal == CTRL_C_EVENT)
     {
         run = false;
@@ -59,7 +60,10 @@ int main(const int argc, const char ** argv)
     try
     {
         auto error = parser.parse(argc, argv);
-        if(!error)
+        if(!error 
+            && parser.exists("port") 
+            && parser.exists("cert") 
+            && parser.exists("key"))
         {
             if(parser.exists("threads"))
             {
@@ -156,7 +160,7 @@ void server_main(
         {
             bool loop(true);
             ice::native_socket_t con;
-            while(loop)
+            while(run && loop)
             {
                 con = accept(srv,nullptr,nullptr);
                 if(con > 0)
@@ -194,7 +198,6 @@ void process_request(
     ice::ssl_context& ctx,
     const ice::native_socket_t desc)
 {
-    std::cerr << "a" << std::endl;
     uint32_t read_size,write_size;
     std::array<uint8_t,BUF_SIZE> buffer;
     ice::ssl_socket sock(ctx,desc);
@@ -204,7 +207,6 @@ void process_request(
     read_size = sock.read(
         buffer.data(),
         static_cast<uint32_t>(buffer.size()));
-    std::cerr << "b" << std::endl;
     
     if(read_size < 0)
     {
@@ -219,13 +221,11 @@ void process_request(
             read_size);
         std::cerr << std::endl;
     }
-    std::cerr << "c" << std::endl;
     
     write_size = sock.write(
         reinterpret_cast<const uint8_t* const>(
             reply.data()),
         static_cast<uint32_t>(reply.size()));
-    std::cerr << "d" << std::endl;
 
     if(write_size < 0)
     {
