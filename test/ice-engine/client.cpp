@@ -131,8 +131,8 @@ int main(const int argc, const char ** argv)
                   << "/" 
                   << count 
                   << " in " 
-                  << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
-                  << "ms" 
+                  << std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() 
+                  << "ns" 
                   << std::endl;
 
         for(auto & thread : thread_vector)
@@ -151,7 +151,6 @@ int main(const int argc, const char ** argv)
 
     return 0;
 }
-
 
 void randomize(uint8_t * const buf, const uint32_t len)
 {
