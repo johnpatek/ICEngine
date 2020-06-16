@@ -59,7 +59,12 @@ int main(const int argc, const char ** argv)
 
         while(thread_vector.size() < threads)
         {
-            thread_vector.push_back(std::thread([&score,&secure_context,&count,&addr,&rand_buf]
+            thread_vector.push_back(std::thread([
+                &score,
+                &secure_context,
+                &count,
+                &addr,
+                &rand_buf]
             {
                 ice::native_socket_t sock;
                 std::array<uint8_t,BUF_SIZE> read_buf;
@@ -75,7 +80,10 @@ int main(const int argc, const char ** argv)
                         throw std::runtime_error("Bad socket");
                     }
 
-                    if(connect(sock,reinterpret_cast<struct sockaddr*>(&addr),sizeof(addr)) < 0)
+                    if(connect(
+                        sock,
+                        reinterpret_cast<struct sockaddr*>(&addr),
+                        sizeof(addr)) < 0)
                     {
                         throw std::runtime_error("Bad connection");
                     }
@@ -87,17 +95,24 @@ int main(const int argc, const char ** argv)
                         throw std::runtime_error("Bad SSL connection");
                     }
 
-                    if(secure_socket.write(rand_buf.data() + mark,static_cast<uint32_t>(BUF_SIZE)) < 0)
+                    if(secure_socket.write(
+                        rand_buf.data() + mark,
+                        static_cast<uint32_t>(BUF_SIZE)) < 0)
                     {
                         throw std::runtime_error("Bad write");    
                     }
 
-                    if(secure_socket.read(read_buf.data(),static_cast<uint32_t>(BUF_SIZE)) < 0)
+                    if(secure_socket.read(
+                        read_buf.data(),
+                        static_cast<uint32_t>(BUF_SIZE)) < 0)
                     {
                         throw std::runtime_error("Bad read");
                     }
 
-                    if(std::memcmp(rand_buf.data() + mark, read_buf.data(),BUF_SIZE) != 0)
+                    if(std::memcmp(
+                        rand_buf.data() + mark, 
+                        read_buf.data(),
+                        BUF_SIZE) != 0)
                     {
                         throw std::runtime_error("Data mismatch");    
                     }
@@ -128,13 +143,6 @@ int main(const int argc, const char ** argv)
     catch(const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
-    }
-
-
-
-    for(auto & thread : thread_vector)
-    {
-        thread.join();
     }
 
 #ifdef _WIN32
