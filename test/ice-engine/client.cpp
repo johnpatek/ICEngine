@@ -23,6 +23,7 @@ int main(const int argc, const char ** argv)
     parser.add_argument("-t","--threads","threads",true);
     struct sockaddr_in addr;
     uint32_t count,threads;
+    std::vector<uint8_t> rand_buf;
     std::vector<std::thread> thread_vector;
 
     std::atomic<uint32_t> score;
@@ -48,18 +49,24 @@ int main(const int argc, const char ** argv)
 
         ice::ssl_context secure_context(ice::CLIENT_TCP_SOCKET);
 
+        rand_buf.resize(count * BUF_SIZE);
+
+        randomize(
+            rand_buf.data(),
+            static_cast<uint32_t>(rand_buf.size()));
+
         auto start = std::chrono::steady_clock::now();
 
         while(thread_vector.size() < threads)
         {
-            thread_vector.push_back(std::thread([&score,&secure_context,&count,&addr]
+            thread_vector.push_back(std::thread([&score,&secure_context,&count,&addr,&rand_buf]
             {
                 ice::native_socket_t sock;
-                std::array<uint8_t,BUF_SIZE> in_buf;
-                std::array<uint8_t,BUF_SIZE> out_buf;
+                std::array<uint8_t,BUF_SIZE> read_buf;
+                uint32_t mark;
                 while(score.load() < count)
                 {
-                    randomize(in_buf.data(),static_cast<uint32_t>(in_buf.size()));
+                    mark = score++ * BUF_SIZE;
 
                     sock = socket(PF_INET,SOCK_STREAM,0);
 
@@ -80,31 +87,28 @@ int main(const int argc, const char ** argv)
                         throw std::runtime_error("Bad SSL connection");
                     }
 
-                    if(secure_socket.write(in_buf.data(),static_cast<uint32_t>(in_buf.size())) < 0)
+                    if(secure_socket.write(rand_buf.data() + mark,static_cast<uint32_t>(BUF_SIZE)) < 0)
                     {
                         throw std::runtime_error("Bad write");    
                     }
 
-                    if(secure_socket.read(out_buf.data(),static_cast<uint32_t>(out_buf.size())) < 0)
+                    if(secure_socket.read(read_buf.data(),static_cast<uint32_t>(BUF_SIZE)) < 0)
                     {
                         throw std::runtime_error("Bad read");
                     }
 
-                    if(std::memcmp(in_buf.data(),out_buf.data(),BUF_SIZE) != 0)
+                    if(std::memcmp(rand_buf.data() + mark, read_buf.data(),BUF_SIZE) != 0)
                     {
                         throw std::runtime_error("Data mismatch");    
                     }
-
-                    score++;
                 }
             }));
         }
 
-        do
+        while(score.load() < count)
         {
             std::this_thread::yield();
         }
-        while(score.load() < count);
 
         auto end = std::chrono::steady_clock::now();
 

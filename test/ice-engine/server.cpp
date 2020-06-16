@@ -12,7 +12,6 @@
 #endif
 
 const uint32_t BUF_SIZE = 1024;
-const std::string reply = "Message from server\r\n";
 bool run;
 
 #ifdef _WIN32
@@ -36,10 +35,6 @@ void server_main(
     const std::string key_path, 
     const int port,
     const int threads);
-
-void process_request(
-    ice::ssl_context& ctx,
-    const ice::native_socket_t desc);
 
 int main(const int argc, const char ** argv)
 {
