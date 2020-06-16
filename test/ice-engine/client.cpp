@@ -16,7 +16,7 @@ void randomize(uint8_t * const buf, const uint32_t len);
 
 int main(const int argc, const char ** argv)
 {
-    argparse::ArgumentParser parser("client","Test client");
+    ice::argument_parser parser("client","Test client");
     parser.add_argument("-a","--address","address",true);
     parser.add_argument("-p","--port","port",true);
     parser.add_argument("-c","--count","count",true);
@@ -95,15 +95,16 @@ int main(const int argc, const char ** argv)
                         throw std::runtime_error("Data mismatch");    
                     }
 
-                    score.fetch_add(1);
+                    score++;
                 }
             }));
         }
 
-        while(score.load() < count)
+        do
         {
             std::this_thread::yield();
         }
+        while(score.load() < count);
 
         auto end = std::chrono::steady_clock::now();
 

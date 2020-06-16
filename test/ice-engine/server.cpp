@@ -45,7 +45,7 @@ int main(const int argc, const char ** argv)
 {
     run = true;
     int threads = std::thread::hardware_concurrency();
-    argparse::ArgumentParser parser("server","An example server app.");
+    ice::argument_parser parser("server","Test server");
     parser.add_argument("-p","--port","port",true);
     parser.add_argument("-c","--cert","cert",true);
     parser.add_argument("-k","--key","key",true);

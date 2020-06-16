@@ -15,7 +15,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace argparse {
+namespace ice {
 namespace detail {
 static inline bool _not_space(int ch) { return !std::isspace(ch); }
 static inline void _ltrim(std::string &s, bool (*f)(int) = _not_space) {
@@ -106,7 +106,7 @@ struct is_vector {
 };
 }  // namespace detail
 
-class ArgumentParser {
+class argument_parser {
  private:
  public:
   class Argument;
@@ -199,7 +199,7 @@ class ArgumentParser {
 
     Argument() {}
 
-    friend class ArgumentParser;
+    friend class argument_parser;
     int _position{Position::DONT_CARE};
     int _count{Count::ANY};
     std::vector<std::string> _names{};
@@ -211,7 +211,7 @@ class ArgumentParser {
     std::vector<std::string> _values{};
   };
 
-  ArgumentParser(const std::string &bin, const std::string &desc)
+  argument_parser(const std::string &bin, const std::string &desc)
       : _bin(bin), _desc(desc) {}
 
   Argument &add_argument() {
@@ -542,17 +542,17 @@ class ArgumentParser {
   std::map<std::string, int> _name_map{};
 };
 
-std::ostream &operator<<(std::ostream &os, const ArgumentParser::Result &r) {
+std::ostream &operator<<(std::ostream &os, const argument_parser::Result &r) {
   os << r.what();
   return os;
 }
 template <>
-inline std::string ArgumentParser::Argument::get<std::string>() {
+inline std::string argument_parser::Argument::get<std::string>() {
   return detail::_join(_values.begin(), _values.end());
 }
 template <>
 inline std::vector<std::string>
-ArgumentParser::Argument::get<std::vector<std::string>>() {
+argument_parser::Argument::get<std::vector<std::string>>() {
   return _values;
 }
 
