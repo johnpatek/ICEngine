@@ -135,12 +135,12 @@ int32_t ice::ssl_socket::write(
         size);
 }
 
-void ice::ssl_socket::accept()
+int32_t ice::ssl_socket::accept()
 {
-    SSL_accept(static_cast<SSL*>(_ssl.get()));
+    return static_cast<int32_t>(SSL_accept(static_cast<SSL*>(_ssl.get())));
 }
 
-void ice::ssl_socket::connect()
+int32_t ice::ssl_socket::connect()
 {
-    SSL_connect(static_cast<SSL*>(_ssl.get()));
+    return static_cast<int32_t>(SSL_connect(static_cast<SSL*>(_ssl.get())));
 }

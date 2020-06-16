@@ -158,6 +158,8 @@ void server_main(
     {
         server_threads.push_back(std::thread([&ctx,&srv]
         {
+            std::array<uint8_t,BUF_SIZE> buf;
+            int32_t read_size,write_size;
             bool loop(true);
             ice::native_socket_t con;
             while(run && loop)
@@ -165,7 +167,16 @@ void server_main(
                 con = accept(srv,nullptr,nullptr);
                 if(con > 0)
                 {
-                    process_request(ctx,con);
+                    ice::ssl_socket sock(ctx,con);
+                    loop = (sock.accept() == 0);
+                    read_size = sock.read(buf.data(),static_cast<uint32_t>(buf.size()));
+                    loop = read_size >= 0;
+                    write_size = sock.write(buf.data(),read_size);
+                    loop = loop && (read_size == write_size);
+                    if(!loop)
+                    {
+                        throw std::runtime_error("server fault");
+                    }
                 }
                 else
                 {

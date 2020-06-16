@@ -1,19 +1,31 @@
 #include "ice-engine/argparse.h"
 #include "ice-engine/network.h"
+#include <array>
+#include <atomic>
+#include <chrono>
 #include <iostream>
+#include <thread>
+#include <vector>
+#include <cmath>
+#include <ctime>
+#include <ctime>
+
+const uint32_t BUF_SIZE = 1024;
+
+void randomize(uint8_t * const buf, const uint32_t len);
 
 int main(const int argc, const char ** argv)
 {
-    argparse::ArgumentParser parser("client","A sample client application");
+    argparse::ArgumentParser parser("client","Test client");
     parser.add_argument("-a","--address","address",true);
     parser.add_argument("-p","--port","port",true);
-
-    ice::native_socket_t sock;
+    parser.add_argument("-c","--count","count",true);
+    parser.add_argument("-t","--threads","threads",true);
     struct sockaddr_in addr;
-    std::shared_ptr<ice::ssl_context> secure_context;
-    std::shared_ptr<ice::ssl_socket> secure_socket;
-    const std::string msg = "Hello from the client";
-    char msg_buf[100] = {0};
+    uint32_t count,threads;
+    std::vector<std::thread> thread_vector;
+
+    std::atomic<uint32_t> score;
 
 #ifdef _WIN32
     WSADATA wsaData;
@@ -21,11 +33,8 @@ int main(const int argc, const char ** argv)
 #endif
     
     try
-    {
+    {           
         parser.parse(argc,argv);
-
-        sock = socket(PF_INET,SOCK_STREAM,0);
-        
         addr.sin_family = AF_INET;
         inet_pton(
             AF_INET,
@@ -33,38 +42,94 @@ int main(const int argc, const char ** argv)
             &addr.sin_addr.s_addr);
         addr.sin_port = htons(parser.get<int>("port"));
 
-        connect(sock,reinterpret_cast<struct sockaddr*>(&addr),sizeof(addr));
+        count = parser.get<uint32_t>("count");
 
-        secure_context = std::make_shared<ice::ssl_context>(
-            ice::CLIENT_TCP_SOCKET);
+        threads = parser.get<uint32_t>("threads");
 
-        secure_socket = std::make_shared<ice::ssl_socket>(
-            *secure_context,
-            sock);
+        ice::ssl_context secure_context(ice::CLIENT_TCP_SOCKET);
 
-        secure_socket->connect();
+        auto start = std::chrono::steady_clock::now();
 
-        if(secure_socket->write(
-            reinterpret_cast<const uint8_t* const>(msg.data()),
-            static_cast<uint32_t>(msg.size())) < 0)
+        while(thread_vector.size() < threads)
         {
-            throw std::runtime_error("Unable to write to socket");
+            thread_vector.push_back(std::thread([&score,&secure_context,&count,&addr]
+            {
+                ice::native_socket_t sock;
+                std::array<uint8_t,BUF_SIZE> in_buf;
+                std::array<uint8_t,BUF_SIZE> out_buf;
+                while(score.load() < count)
+                {
+                    randomize(in_buf.data(),static_cast<uint32_t>(in_buf.size()));
+
+                    sock = socket(PF_INET,SOCK_STREAM,0);
+
+                    if(sock < 0)
+                    {
+                        throw std::runtime_error("Bad socket");
+                    }
+
+                    if(connect(sock,reinterpret_cast<struct sockaddr*>(&addr),sizeof(addr)) < 0)
+                    {
+                        throw std::runtime_error("Bad connection");
+                    }
+
+                    ice::ssl_socket secure_socket(secure_context,sock);
+
+                    if(secure_socket.connect() < 0)
+                    {
+                        throw std::runtime_error("Bad SSL connection");
+                    }
+
+                    if(secure_socket.write(in_buf.data(),static_cast<uint32_t>(in_buf.size())) < 0)
+                    {
+                        throw std::runtime_error("Bad write");    
+                    }
+
+                    if(secure_socket.read(out_buf.data(),static_cast<uint32_t>(out_buf.size())) < 0)
+                    {
+                        throw std::runtime_error("Bad read");
+                    }
+
+                    if(std::memcmp(in_buf.data(),out_buf.data(),BUF_SIZE) != 0)
+                    {
+                        throw std::runtime_error("Data mismatch");    
+                    }
+
+                    score.fetch_add(1);
+                }
+            }));
         }
 
-        std::cerr << "Client message sent" << std::endl;
-        
-        if(secure_socket->read(
-            reinterpret_cast<uint8_t* const>(msg_buf),
-            100) < 0)
+        while(score.load() < count)
         {
-            throw std::runtime_error("Unable to read from socket");
+            std::this_thread::yield();
         }
 
-        std::cerr << "message from server: " << msg_buf << std::endl;
+        auto end = std::chrono::steady_clock::now();
+
+        std::cerr << score 
+                  << "/" 
+                  << count 
+                  << " in " 
+                  << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() 
+                  << "ms" 
+                  << std::endl;
+
+        for(auto & thread : thread_vector)
+        {
+            thread.join();
+        }
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
+    }
+
+
+
+    for(auto & thread : thread_vector)
+    {
+        thread.join();
     }
 
 #ifdef _WIN32
@@ -72,4 +137,13 @@ int main(const int argc, const char ** argv)
 #endif
 
     return 0;
+}
+
+
+void randomize(uint8_t * const buf, const uint32_t len)
+{
+    for(uint32_t off = 0; off < len; off++)
+    {
+        *(buf + off) = static_cast<uint8_t>(rand() % 256);
+    }
 }
