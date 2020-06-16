@@ -18,7 +18,6 @@ bool run;
 #ifdef _WIN32
 BOOL WINAPI signal_handler(DWORD signal) 
 {
-    std::cerr << "ctrl-c" << std::endl;
     if (signal == CTRL_C_EVENT)
     {
         run = false;
@@ -67,7 +66,7 @@ int main(const int argc, const char ** argv)
         {
             if(parser.exists("threads"))
             {
-                parser.get<int>("threads");
+                threads = parser.get<int>("threads");
             }
 
         #ifdef _WIN32
@@ -154,6 +153,8 @@ void server_main(
         throw std::runtime_error("Unable to listen");
     }
 
+    std::cerr << "Starting on " << threads << " threads" << std::endl;
+
     while(server_threads.size() < threads)
     {
         server_threads.push_back(std::thread([&ctx,&srv]
@@ -191,6 +192,8 @@ void server_main(
         std::this_thread::yield();
     }
 
+    std::cerr << "Joining " << threads << " threads" << std::endl;
+
 #ifdef _WIN32
     closesocket(srv);
 #else
@@ -200,46 +203,5 @@ void server_main(
     for(auto& server_thread : server_threads)
     {
         server_thread.join();
-    }
-}
-
-std::mutex mtx;
-
-void process_request(
-    ice::ssl_context& ctx,
-    const ice::native_socket_t desc)
-{
-    uint32_t read_size,write_size;
-    std::array<uint8_t,BUF_SIZE> buffer;
-    ice::ssl_socket sock(ctx,desc);
-    
-    sock.accept();
-
-    read_size = sock.read(
-        buffer.data(),
-        static_cast<uint32_t>(buffer.size()));
-    
-    if(read_size < 0)
-    {
-        throw std::runtime_error("Unable to read from socket");
-    }
-    else
-    {
-        std::unique_lock<std::mutex> lock(mtx);
-        std::cerr.write(
-            reinterpret_cast<const char*>(
-                buffer.data()),
-            read_size);
-        std::cerr << std::endl;
-    }
-    
-    write_size = sock.write(
-        reinterpret_cast<const uint8_t* const>(
-            reply.data()),
-        static_cast<uint32_t>(reply.size()));
-
-    if(write_size < 0)
-    {
-        throw std::runtime_error("Unable to write to socket");
     }
 }
