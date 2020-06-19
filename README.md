@@ -9,8 +9,18 @@ framework.
 
 ## How to build
 
-First, build the common dependencies:
+First, build the common dependencies. Then, run the build scripts.
 
-```powershell
+### Windows
+
+```bat
 build_common.bat
+cmake.bat
+```
+
+### Linux
+
+```bash
+./build_common.sh
+./cmake.sh
 ```
