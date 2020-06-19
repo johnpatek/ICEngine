@@ -13,14 +13,14 @@ First, build the common dependencies. Then, run the build scripts.
 
 ### Windows
 
-```bat
+```powershell
 build_common.bat
 cmake.bat
 ```
 
 ### Linux
 
-```bash
+```sh
 ./build_common.sh
 ./cmake.sh
 ```
