@@ -11,6 +11,6 @@ framework.
 
 First, build the common dependencies:
 
-"""bat
+"""powershell
 build_common.bat
 """

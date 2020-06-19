@@ -65,40 +65,40 @@ target_link_libraries(
 
 file(GLOB CLIENT_SOURCES
     "include/ice-engine/*.h"
-    "test/ice-engine/client.cpp")
+    "test/ice-engine/tcp_client.cpp")
 
 add_executable(
-    client
+    tcp-client
     ${CLIENT_SOURCES})
 
 target_include_directories(
-    client
+    tcp-client
     PUBLIC 
     ${PROJ_INCLUDE}
     ${COMMON_INCLUDE})
 
 target_link_libraries(
-    client 
+    tcp-client 
     PUBLIC
     ice-engine-sdk
     ${PTHREAD})
 
 file(GLOB SERVER_SOURCES
     "include/ice-engine/*.h"
-    "test/ice-engine/server.cpp")
+    "test/ice-engine/tcp_server.cpp")
 
 add_executable(
-    server
+    tcp-server
     ${SERVER_SOURCES})
 
 target_include_directories(
-    server
+    tcp-server
     PUBLIC 
     ${PROJ_INCLUDE}
     ${COMMON_INCLUDE})
 
 target_link_libraries(
-    server 
+    tcp-server 
     PUBLIC
     ice-engine-sdk
     ${PTHREAD})
