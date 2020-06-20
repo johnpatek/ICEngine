@@ -117,10 +117,14 @@ void bluetooth_server(
                     buf.data()),
                 buf.size());
             std::cerr << std::endl;
-            secure_sock.write(
+            write_size = secure_sock.write(
                 reinterpret_cast<const uint8_t * const>(
                     SRV_MSG.data()),
                 SRV_MSG.size());
+            if(write_size < 0)
+            {
+                
+            }
         }
         else
         {
