@@ -65,7 +65,7 @@ target_link_libraries(
 
 file(GLOB CLIENT_SOURCES
     "include/ice-engine/*.h"
-    "test/ice-engine/tcp_client.cpp")
+    "examples/ice-engine/tcp_client.cpp")
 
 add_executable(
     tcp-client
@@ -85,7 +85,7 @@ target_link_libraries(
 
 file(GLOB SERVER_SOURCES
     "include/ice-engine/*.h"
-    "test/ice-engine/tcp_server.cpp")
+    "examples/ice-engine/tcp_server.cpp")
 
 add_executable(
     tcp-server
@@ -99,6 +99,46 @@ target_include_directories(
 
 target_link_libraries(
     tcp-server 
+    PUBLIC
+    ice-engine-sdk
+    ${PTHREAD})
+
+    file(GLOB CLIENT_SOURCES
+    "include/ice-engine/*.h"
+    "examples/ice-engine/bluetooth_client.cpp")
+
+add_executable(
+    bluetooth-client
+    ${CLIENT_SOURCES})
+
+target_include_directories(
+    bluetooth-client
+    PUBLIC 
+    ${PROJ_INCLUDE}
+    ${COMMON_INCLUDE})
+
+target_link_libraries(
+    bluetooth-client 
+    PUBLIC
+    ice-engine-sdk
+    ${PTHREAD})
+
+file(GLOB SERVER_SOURCES
+    "include/ice-engine/*.h"
+    "examples/ice-engine/bluetooth_server.cpp")
+
+add_executable(
+    bluetooth-server
+    ${SERVER_SOURCES})
+
+target_include_directories(
+    bluetooth-server
+    PUBLIC 
+    ${PROJ_INCLUDE}
+    ${COMMON_INCLUDE})
+
+target_link_libraries(
+    bluetooth-server 
     PUBLIC
     ice-engine-sdk
     ${PTHREAD})
