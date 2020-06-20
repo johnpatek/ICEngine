@@ -31,7 +31,7 @@ namespace ice
         CLIENT_UDP_SOCKET,
         SERVER_UDP_SOCKET
     };
-    
+
     class ssl_context
     {
     private:
@@ -81,6 +81,6 @@ namespace ice
             uint32_t size);
     };
     
-    
+
 }
 #endif
