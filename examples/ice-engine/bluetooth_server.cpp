@@ -9,7 +9,7 @@
 #include <atomic>
 
 const uint32_t BUF_SIZE = 1024;
-
+const std::string SRV_MSG("Hello from the server");
 std::atomic<bool> run;
 
 // Handlers for ctrl-c shutdown
@@ -103,12 +103,24 @@ void bluetooth_server(
             ice::ssl_socket secure_sock(
                 ctx,
                 cli);
+            secure_sock.accept();
             read_size = secure_sock.read(buf.data(),buf.size());
             if(read_size < 0)
             {
                 throw std::runtime_error("Bad read");
             }
-            
+            std::cerr << "Message Received:" 
+                      << std:: endl
+                      << "Address: ";
+            std::cerr.write(
+                reinterpret_cast<const char*>(
+                    buf.data()),
+                buf.size());
+            std::cerr << std::endl;
+            secure_sock.write(
+                reinterpret_cast<const uint8_t * const>(
+                    SRV_MSG.data()),
+                SRV_MSG.size());
         }
         else
         {
