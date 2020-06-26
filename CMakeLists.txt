@@ -14,8 +14,6 @@ set(COMMON_LIB ${COMMON_ROOT}/lib)
 
 set(PROJ_INCLUDE ${CMAKE_SOURCE_DIR}/include)
 
-include_directories(${PROJ_INCLUDE} ${COMMON_INCLUDE})
-
 if(WIN32)
     set(PTHREAD "")
     find_library(SSL_LIB_NAME libssl-1_1-x64.lib PATHS ${COMMON_LIB})
@@ -29,9 +27,11 @@ else()
     set(PTHREAD Threads::Threads)
     find_library(SSL_LIB_NAME libssl.a PATHS ${COMMON_LIB})
     find_library(CRYPTO_LIB_NAME libcrypto.a PATHS ${COMMON_LIB})
-    # find_library(SDL2_LIB_NAME SDL2_staticd.a PATHS ${COMMON_LIB})
     find_library(DL libdl.so PATHS /usr/lib/x86_64-linux-gnu/)
 endif(WIN32)
+
+include_directories(${PROJ_INCLUDE} ${COMMON_INCLUDE})
+
 
 file(GLOB ENGINE_SOURCES
     "include/ice-engine/*.h"    
@@ -105,40 +105,40 @@ target_link_libraries(
 
     file(GLOB CLIENT_SOURCES
     "include/ice-engine/*.h"
-    "examples/ice-engine/bluetooth_client.cpp")
+    "examples/ice-engine/udp_client.cpp")
 
 add_executable(
-    bluetooth-client
+    udp-client
     ${CLIENT_SOURCES})
 
 target_include_directories(
-    bluetooth-client
+    udp-client
     PUBLIC 
     ${PROJ_INCLUDE}
     ${COMMON_INCLUDE})
 
 target_link_libraries(
-    bluetooth-client 
+    udp-client 
     PUBLIC
     ice-engine-sdk
     ${PTHREAD})
 
 file(GLOB SERVER_SOURCES
     "include/ice-engine/*.h"
-    "examples/ice-engine/bluetooth_server.cpp")
+    "examples/ice-engine/udp_server.cpp")
 
 add_executable(
-    bluetooth-server
+    udp-server
     ${SERVER_SOURCES})
 
 target_include_directories(
-    bluetooth-server
+    udp-server
     PUBLIC 
     ${PROJ_INCLUDE}
     ${COMMON_INCLUDE})
 
 target_link_libraries(
-    bluetooth-server 
+    udp-server 
     PUBLIC
     ice-engine-sdk
     ${PTHREAD})

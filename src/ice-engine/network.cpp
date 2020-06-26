@@ -1,6 +1,5 @@
 #include "ice-engine/network.h"
 #include <openssl/ssl.h>
-#include <iostream>
 
 static void * init_ctx(int peer_type)
 {
