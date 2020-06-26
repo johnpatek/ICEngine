@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.0)
 
 project(ice-engine C CXX)
 
-set( CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" )
-
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 
 set(COMMON_ROOT ${CMAKE_SOURCE_DIR}/common/build/install)
