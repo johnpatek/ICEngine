@@ -35,6 +35,6 @@ cmake.bat
     + TLS example done
 - [ ] Design a file storage solution for game resources with considerations regarding:
     + Hashing for file names
-    + Security for resource data(>)
+    + Security for resource data(?)
     + Integration with client/server model to synchronize resources and optimize storage footprint
-    
+    + A cross platform file IO API that can bypass the buffer delays of std::fstream when needed.
