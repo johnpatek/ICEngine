@@ -26,7 +26,8 @@ cmake.bat
 ```
 ## TODO
 
-- [ ] Design a serializable model for game objects(JSON, CapNProto, etc.)
+- [ ] Design a serializable model for game objects
+    + Select a framework for object marshalling(JSON, CapNProto, etc.)
     + Efficient, consistent, and portable design for file and network IO
     + Flexible design to allow audio, 3D mesh, video, and other multimedia files
 - [ ] Implement a physics engine to manager object dynamics
@@ -39,9 +40,9 @@ cmake.bat
 - [ ] Wrap SDL Window, Rendeder, Surface, other graphics APIs in C++
     + Allow for compatibility with OpenGL
     + Possibly generalize API for DirectX, Vulkan, etc.
-- [ ] Implement a secure socket wrapper for UDP and TCP.
-    + DTLS example in progress
-    + TLS example done
+- [x] Implement a secure socket wrapper for UDP and TCP.
+    + DTLS done
+    + TLS done
 - [ ] Design a file storage solution for game resources with considerations regarding:
     + Hashing for file names
     + Security for resource data(?)
@@ -54,3 +55,14 @@ cmake.bat
 - [ ] Utilize a thread pool to improve throughput on parallelizable tasks
     + Allow default optimization based on system hardware
     + Provide both a synchronized and asynchronous interface for submitting work to thread pool
+- [ ] Documentation
+    + Add doxygen comments to header files
+    + Add document generation to CMakeLists
+- [ ] Packaging and Installation
+    + Add CPack and intall directives in CMakeLists
+    + Find a way to generate installer files for Windows
+- [ ] Unit Testing
+    + Select a test framework(ctest, gtest, etc.)
+    + Write a set of tests to cover API
+    + Add build instructions for unit test
+    + CI/CD scripts for running unit test in pipelines
