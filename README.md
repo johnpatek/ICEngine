@@ -33,16 +33,18 @@ cmake.bat
 - [ ] Implement a physics engine to manager object dynamics
     + Collision logic and behavior for fixed objects
     + Particle physics
-    + Ragdoll physics(graphics compatibilty and modelling 3D required)
+    + Ragdoll physics(graphics compatibilty required)
 - [ ] Implement an interface for input events in SDL
     + Allow engine to bind callback functions to key and mouse events
     + Optionally support more advanced input devices such as xbox controllers
 - [ ] Wrap SDL Window, Rendeder, Surface, other graphics APIs in C++
+    + Create interface for reading renderable game objects
     + Allow for compatibility with OpenGL
     + Possibly generalize API for DirectX, Vulkan, etc.
-- [x] Implement a secure socket wrapper for UDP and TCP.
-    + DTLS done
-    + TLS done
+- [ ] Add networking features
+    + TLS for secure TCP and UDP sockets.
+    + Basic http(s) functionality for REST API, webpages etc.
+    + Consider bluetooth and other protocols to allow for wireless controllers, microphones, etc.
 - [ ] Design a file storage solution for game resources with considerations regarding:
     + Hashing for file names
     + Security for resource data(?)

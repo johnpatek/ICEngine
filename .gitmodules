@@ -7,3 +7,6 @@
 [submodule "common/json11"]
 	path = common/json11
 	url = https://github.com/johnpatek/json11
+[submodule "common/googletest"]
+	path = common/googletest
+	url = https://github.com/google/googletest
