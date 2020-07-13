@@ -80,7 +80,5 @@ namespace ice
             const uint8_t * const data, 
             uint32_t size);
     };
-    
-
 }
 #endif

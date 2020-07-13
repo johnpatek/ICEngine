@@ -6,10 +6,6 @@
 
 namespace ice
 {
-    void init_graphics();
-
-    void deinit_graphics();
-
     class window
     {
     private:

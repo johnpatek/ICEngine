@@ -32,7 +32,6 @@ endif(WIN32)
 
 include_directories(${PROJ_INCLUDE} ${COMMON_INCLUDE})
 
-
 file(GLOB ENGINE_SOURCES
     "include/ice-engine/*.h"    
     "src/ice-engine/*.cpp")
