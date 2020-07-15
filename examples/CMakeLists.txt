@@ -61,3 +61,5 @@ target_link_libraries(
     PUBLIC
     ice-engine-sdk
     ${PTHREAD})
+
+add_subdirectory(tls-logger)

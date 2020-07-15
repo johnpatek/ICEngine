@@ -34,7 +34,6 @@ int main(const int argc, const char ** argv)
         {
             std::cerr << "Server Fault: " << e.what() << std::endl;
         }
-            
     }
     else
     {
