@@ -1,5 +1,5 @@
 #include "ice-engine/graphics.h"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 static void * init_window(
     const char * const title, 
