@@ -1,35 +1,31 @@
 add_executable(
-    log-client
-    common.h
-    common.cpp
+    tls-client
     client.cpp)
 
 target_include_directories(
-    log-client
+    tls-client
     PUBLIC 
     ${PROJ_INCLUDE}
     ${COMMON_INCLUDE})
 
 target_link_libraries(
-    log-client 
+    tls-client 
     PUBLIC
     ice-engine-sdk
     ${PTHREAD})
 
 add_executable(
-    log-server
-    common.h
-    common.cpp
+    tls-server
     server.cpp)
 
 target_include_directories(
-    log-server
+    tls-server
     PUBLIC 
     ${PROJ_INCLUDE}
     ${COMMON_INCLUDE})
 
 target_link_libraries(
-    log-server 
+    tls-server 
     PUBLIC
     ice-engine-sdk
     ${PTHREAD})
