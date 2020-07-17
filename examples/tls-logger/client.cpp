@@ -1,94 +1,74 @@
 #include "common.h"
 #include "ice-engine/argparse.h"
 
-class log_client
+class client
 {
 private:
     ice::ssl_context _ctx;
     std::string _host;
     uint16_t _port;
 
-    void send_request(uint8_t command, const uint8_t * const buf, uint32_t len)
+    void send_request( 
+        uint8_t message_command, 
+        const uint8_t * const message_buffer,
+        const uint32_t message_length)
     {
-        ice::native_socket_t cli = open_socket(CLIENT, _host.c_str(), _port);
-        ice::ssl_socket sock(_ctx, cli);
-        int32_t read_size, write_size;
-        std::array<uint8_t,BUFFER_SIZE> buffer;
-        uint8_t status;
-        bool read_loop;
-
-        if(sock.connect() < 0)
-        {
-            throw std::runtime_error("SSL connection error");
-        }
-
-        write_size = sock.write(&command,1);
+        common::request_header request_header;
+        common::response_header response_header;
+        ice::native_socket_t client_socket = common::open_socket(
+            common::CLIENT,_host.c_str(),_port);
+        ice::ssl_socket secure_socket(_ctx,client_socket);
         
-        if(write_size < 0)
-        {
-            throw std::runtime_error("Error: Unable to write header");
-        }
-
-        write_size = sock.write(buf,len);
+        common::pack_request_header(
+            &request_header,
+            message_command,
+            common::timestamp(),
+            message_length);
         
-        if(write_size < 0)
+        if(secure_socket.connect() < 0)
         {
-            throw std::runtime_error("Error: Unable to write header");
+            throw std::runtime_error("SSL connection failed");
         }
 
-        read_size = sock.read(&status,1);
-
-        read_loop = (read_size == 1) && (status == 0) && (command == DUMP);
-
-        while(read_loop)
+        if(secure_socket.write(
+            reinterpret_cast<uint8_t*>(&request_header),
+            common::REQUEST_HEADER_SIZE) < 0)
         {
-            read_size = sock.read(buffer.data(),buffer.size());
-
-            if(read_size > 0)
-            {
-                std::cerr.write(
-                    reinterpret_cast<const char* const>(
-                        buffer.data()),
-                    buffer.size());
-            }
-            else if(read_size == 0)
-            {
-                read_loop = false;
-            }
-            else
-            {
-                throw std::runtime_error("SSL Socket read error");
-            }
+            throw std::runtime_error("Failed to write request header");
         }
-        std::cerr << std::endl;
-        // No need to close cli as it is closed by ~sock()
+
+        if(message_length > 0 && secure_socket.write(
+            message_buffer, message_length) < 0)
+        {
+            throw std::runtime_error("Failed to write request header");
+        }
+
+        if(secure_socket.read(
+            reinterpret_cast<uint8_t*>(&response_header),
+            common::RESPONSE_HEADER_SIZE) < 0)
+        {
+            throw std::runtime_error("Failed to read response header");    
+        }
     }
 
 public:
-    log_client(const std::string& host, uint16_t port) : _ctx(ice::CLIENT_TCP_SOCKET)
+    client(const std::string & host, const uint16_t port) : _ctx(ice::CLIENT_TCP_SOCKET)
     {
         _host = host;
         _port = port;
     }
 
-    void log(const std::string& message)
-    {
-        if(message.size() > 0)
-        {
-            send_request(
-                LOG,
-                reinterpret_cast<const uint8_t* const>(
-                    message.c_str()),
-                message.size());
-        }
-    }
-
-    void dump()
+    void log_message(const std::string & message)
     {
         send_request(
-            DUMP,
-            nullptr,
-            0);
+            common::command_codes::LOG,
+            reinterpret_cast<const uint8_t* const>(message.c_str()),
+            message.size());
+    }
+
+    void dump_messages()
+    {
+        send_request(common::command_codes::DUMP,nullptr,0);
     }
 };
 
@@ -97,6 +77,7 @@ void client_main(
     const uint16_t port);
 
 void print_help();
+
 
 int main(const int argc, const char ** argv)
 {
@@ -118,8 +99,7 @@ int main(const int argc, const char ** argv)
         catch(const std::exception& e)
         {
             std::cerr << "Client Error: " << e.what() << std::endl;
-        }
-            
+        }            
     }
     else
     {
@@ -129,15 +109,13 @@ int main(const int argc, const char ** argv)
     return 0;
 }
 
-
-
 void client_main(
     const std::string& address, 
     const uint16_t port)
 {
     bool loop(true);
-    log_client client(address,port);
-    std::string command, message_buffer;
+    std::string command, message;
+    client log_client(address,port);
 
 #ifdef _WIN32    
     WSADATA data;
@@ -153,12 +131,12 @@ void client_main(
         if(command == "LOG")
         {
             std::cerr << "enter message: ";
-            std::getline(std::cin,message_buffer);
-            client.log(message_buffer);
+            std::getline(std::cin,message);
+            log_client.log_message(message);
         }
         else if(command == "DUMP")
         {
-            client.dump();
+            log_client.dump_messages();
         }
         else if(command == "QUIT")
         {

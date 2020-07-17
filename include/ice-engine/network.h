@@ -37,6 +37,9 @@ namespace ice
     private:
         std::shared_ptr<void> _ctx;
     public:
+
+        ssl_context() = default;
+
         ssl_context(int peer_type);
         
         ssl_context(
@@ -58,6 +61,9 @@ namespace ice
     private:
         std::shared_ptr<void> _ssl;
     public:
+
+        ssl_socket() = default;
+
         ssl_socket(
              const ssl_context & ctx, 
              native_socket_t desc);

@@ -1,165 +1,129 @@
 #include "common.h"
 #include "ice-engine/argparse.h"
 
-class log_server
+
+class server
 {
 private:
-    // std::vector<std::thread> _threads;
-    // std::mutex _mutex;
-    std::thread worker_thread;
     ice::ssl_context _ctx;
     ice::native_socket_t _srv;
-    bool _open;
     std::string _file_path;
+    std::thread _thread;
+    bool _running;
+    // research mutex
+    std::mutex _file_lock;
 
-
-    void handle_log(ice::ssl_socket & sock)
+    void log_entry(
+        ice::ssl_socket & client_socket, 
+        uint32_t timestamp, 
+        uint32_t length)
     {
-        std::array<uint8_t,BUFFER_SIZE> buffer;
-        uint32_t read_size;
-        bool loop(true);
-        std::fstream log_file(_file_path,std::ios::app | std::ios::out);
-        uint8_t status = 0;
+        // research mutex
+        common::response_header response_header;
+        std::fstream file(_file_path, std::ios::out | std::ios::app);
 
-        while(loop)
-        {
-            read_size = sock.read(buffer.data(),buffer.size());
-            if(read_size > 0)
-            {
-                log_file.write(
-                    reinterpret_cast<const char* const>(
-                        buffer.data()),
-                    buffer.size());
-            }
-            else if(read_size == 0)
-            {
-                loop = false;
-            }
-            else
-            {
-                throw std::runtime_error("Bad read");
-            }
-        }
-        sock.write(&status,1);
+
     }
-
-    void handle_dump(ice::ssl_socket & sock)
-    {
-        std::array<uint8_t,BUFFER_SIZE> buffer;
-        uint32_t read_size, write_size;
-        bool loop(true);
-        std::fstream log_file(_file_path,std::ios::in);
-
-        while(loop)
-        {
-            log_file.read(
-                reinterpret_cast<char*>(
-                    buffer.data()),
-                buffer.size());
-            read_size = log_file.gcount();
-            if(read_size > 0)
-            {
-                sock.write(buffer.data(),buffer.size());
-            }
-            else if(read_size == 0)
-            {
-                loop = false;
-            }
-            else
-            {
-                throw std::runtime_error("Bad read");
-            }
-        }
-    }
-
     
-    void handle_request(ice::ssl_socket & sock)
+    void dump_entries(ice::ssl_socket & client_socket)
     {
-        uint8_t command;
-        if(sock.accept() < 0)
-        {
-            throw std::runtime_error("SSL Accept failed");
-        }
+        // research mutex
+        common::response_header response_header;
+        uint32_t file_size = common::file_size(_file_path);
 
-        if(sock.read(&command,1) < 0)
+        if(file_size > 0)
         {
-            throw std::runtime_error("Read failed");
-        }
-
-        if(command == LOG)
-        {
-            handle_log(sock);
-        }
-        else if(command == DUMP)
-        {
-            handle_dump(sock);
+            std::fstream file(_file_path, std::ios::in);
+            response_header.status = common::status_codes::OK;
         }
         else
         {
-            throw std::runtime_error("Unrecognized command");
+            response_header.status = common::status_codes::ERR;
+            response_header.length = 0;
         }
+    }
+    
+    void handle_request(ice::ssl_socket & client_socket)
+    {
+        common::request_header request_header;
+
+        if(client_socket.read(
+            reinterpret_cast<uint8_t*>(&request_header),
+            common::REQUEST_HEADER_SIZE) < 0)
+        {
+            throw std::runtime_error("Failed to read request header");
+        }
+
+
+
     }
 
 public:
-    log_server(
-        const std::string& cert_path,
-        const std::string& key_path, 
-        uint16_t port) : _ctx(
+    server(
+        const std::string& cert_file, 
+        const std::string& key_file,
+        const uint16_t port) : _ctx(
             ice::SERVER_TCP_SOCKET,
-            cert_path,
-            key_path)
+            cert_file,
+            key_file)
     {
-        _srv = open_socket(SERVER,nullptr,port);
-        _open = true;
+        _srv = common::open_socket(common::SERVER, nullptr, port);
+        _file_path = "output_file.txt";
+        std::fstream file_stream(_file_path);
     }
 
     void start()
     {
-        if(listen(_srv,3) < 0)
-        {
-            throw std::runtime_error("Listen failed");
-        }
-
-        worker_thread = std::thread([this]
+        listen(_srv,3);
+        _thread = std::thread([this]
         {
             this->run();
         });
+        _running = true;
     }
 
     void run()
     {
-        bool is_running(true);
-        ice::native_socket_t cli;
+        bool loop(true);
+        ice::native_socket_t client_socket;
 
-        while(is_running)
+        while(loop)
         {
-            cli = accept(_srv,nullptr,nullptr);
-            if(cli >= 0)
+            client_socket = accept(_srv,nullptr,nullptr);
+
+            if(client_socket >= 0)
             {
-                ice::ssl_socket sock(_ctx,cli);
-                handle_request(sock);
+                ice::ssl_socket secure_socket(_ctx, client_socket);
+                if(secure_socket.accept() < 0)
+                {
+                    throw std::runtime_error("SSL accept failed");
+                }
+                handle_request(secure_socket);
             }
-            else
+            else // client_socket < 0 indicates error
             {
-                is_running = 0;
+                loop = false;
             }
         }
     }
 
     void stop()
     {
-        close_socket(_srv);
-        worker_thread.join();
+        common::close_socket(_srv);
+        _thread.join();
+        _running = false;
     }
 
-    ~log_server()
+    ~server()
     {
-        if(_open)
+        if(_running)
         {
             stop();
         }
+        std::remove(_file_path.c_str());
     }
 };
+
 
 void server_main(
     const std::string& cert,
@@ -218,15 +182,12 @@ void server_main(
     const std::string& key,
     const uint16_t port)
 {
-    log_server server(cert, key, port);
     running = true;
-    server.start();
     signal(SIGINT, signal_callback_handler);
     while(running)
     {
         std::this_thread::yield();
     }
-    server.stop();
 }
 
 void signal_callback_handler(int signum)
