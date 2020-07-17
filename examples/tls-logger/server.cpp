@@ -21,8 +21,29 @@ private:
         // research mutex
         common::response_header response_header;
         std::fstream file(_file_path, std::ios::out | std::ios::app);
+        std::vector<uint8_t> buffer;
 
+        common::pack_response_header(&response_header, 
+            common::status_codes::ERR, 0);
 
+        if(file.good() || length > 0)
+        {
+            response_header.status = common::status_codes::OK;
+            buffer.resize(length);
+            if(client_socket.read(buffer.data(), static_cast<uint32_t>(buffer.size())) < 0)
+            {
+                throw std::runtime_error("Failed to read request body");
+            }
+            file.write(reinterpret_cast<const char*>(buffer.data()),
+                buffer.size());
+            file << std::endl;
+        }
+        
+        if(client_socket.write(reinterpret_cast<const uint8_t * const>(
+            &response_header),common::RESPONSE_HEADER_SIZE) < 0)
+        {
+            throw std::runtime_error("Failed to write response header");
+        }            
     }
     
     void dump_entries(ice::ssl_socket & client_socket)
@@ -30,16 +51,43 @@ private:
         // research mutex
         common::response_header response_header;
         uint32_t file_size = common::file_size(_file_path);
+        std::array<uint8_t, common::BUFFER_SIZE> buffer;
 
         if(file_size > 0)
         {
             std::fstream file(_file_path, std::ios::in);
             response_header.status = common::status_codes::OK;
+            response_header.length = common::file_size(_file_path);
+            
+            if(client_socket.write(reinterpret_cast<const uint8_t * const>(
+                &response_header),common::RESPONSE_HEADER_SIZE) < 0)
+            {
+                throw std::runtime_error("Failed to write response header");
+            }   
+            
+            while(file.good())
+            {
+                file.read(
+                    reinterpret_cast<char*>(
+                        buffer.data()),
+                    buffer.size());
+
+                if(client_socket.write(buffer.data(), file.gcount()) < 0)
+                {
+                    throw std::runtime_error("Failed to write response body");
+                }
+            }
         }
         else
         {
             response_header.status = common::status_codes::ERR;
             response_header.length = 0;
+            if(client_socket.write(reinterpret_cast<const uint8_t * const>(
+                &response_header),common::RESPONSE_HEADER_SIZE) < 0)
+            {
+                throw std::runtime_error("Failed to write response header");
+            }   
+            
         }
     }
     
@@ -54,8 +102,20 @@ private:
             throw std::runtime_error("Failed to read request header");
         }
 
-
-
+        if(request_header.command == common::command_codes::LOG)
+        {
+            log_entry(client_socket, request_header.timestamp, 
+                request_header.length);
+        }
+        else if(request_header.command == common::command_codes::DUMP)
+        {
+            dump_entries(client_socket);
+        }
+        else
+        {
+            // Should be unreachable
+            // Figure out how to write an error packet
+        }
     }
 
 public:
@@ -69,7 +129,7 @@ public:
     {
         _srv = common::open_socket(common::SERVER, nullptr, port);
         _file_path = "output_file.txt";
-        std::fstream file_stream(_file_path);
+        std::fstream file_stream(_file_path, std::ios::out);
     }
 
     void start()
@@ -183,11 +243,18 @@ void server_main(
     const uint16_t port)
 {
     running = true;
+    server log_server(cert, key, port);
+    
     signal(SIGINT, signal_callback_handler);
+    
+    log_server.start();
+    
     while(running)
     {
         std::this_thread::yield();
     }
+    
+    log_server.stop();
 }
 
 void signal_callback_handler(int signum)

@@ -18,7 +18,10 @@ private:
         ice::native_socket_t client_socket = common::open_socket(
             common::CLIENT,_host.c_str(),_port);
         ice::ssl_socket secure_socket(_ctx,client_socket);
-        
+        std::array<uint8_t, common::BUFFER_SIZE> buffer;
+        uint32_t read_size;
+        bool loop(true);
+            
         common::pack_request_header(
             &request_header,
             message_command,
@@ -48,6 +51,29 @@ private:
             common::RESPONSE_HEADER_SIZE) < 0)
         {
             throw std::runtime_error("Failed to read response header");    
+        }
+
+        if(response_header.status == common::status_codes::OK 
+            && response_header.length > 0)
+        {
+            while(loop)
+            {
+                read_size = secure_socket.read(
+                    buffer.data(), buffer.size());
+                if(read_size > 0)
+                {
+                    std::cerr.write(reinterpret_cast<const char*>(buffer.data()),read_size);
+                }
+                else if(read_size == 0)
+                {
+                    loop = false;
+                }
+                else
+                {
+                    throw std::runtime_error("Failed to read response body");
+                }
+            }
+            std::cerr << std::endl;
         }
     }
 
