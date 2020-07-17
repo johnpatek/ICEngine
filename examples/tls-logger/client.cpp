@@ -33,46 +33,27 @@ private:
             throw std::runtime_error("SSL connection failed");
         }
 
-        if(secure_socket.write(
-            reinterpret_cast<uint8_t*>(&request_header),
-            common::REQUEST_HEADER_SIZE) < 0)
-        {
-            throw std::runtime_error("Failed to write request header");
-        }
+        common::write_request_header(secure_socket, &request_header);
 
-        if(message_length > 0 && secure_socket.write(
-            message_buffer, message_length) < 0)
-        {
-            throw std::runtime_error("Failed to write request header");
-        }
+        common::write_request_body(secure_socket, message_buffer, message_length);
 
-        if(secure_socket.read(
-            reinterpret_cast<uint8_t*>(&response_header),
-            common::RESPONSE_HEADER_SIZE) < 0)
-        {
-            throw std::runtime_error("Failed to read response header");    
-        }
+        common::read_response_header(secure_socket, &response_header);
 
-        if(response_header.status == common::status_codes::OK 
-            && response_header.length > 0)
+        if(response_header.length > 0)
         {
-            while(loop)
+            do
             {
-                read_size = secure_socket.read(
-                    buffer.data(), buffer.size());
-                if(read_size > 0)
-                {
-                    std::cerr.write(reinterpret_cast<const char*>(buffer.data()),read_size);
-                }
-                else if(read_size == 0)
-                {
-                    loop = false;
-                }
-                else
-                {
-                    throw std::runtime_error("Failed to read response body");
-                }
-            }
+                read_size = common::read_response_body(
+                    secure_socket,buffer.data(),
+                    static_cast<uint32_t>(buffer.size()));
+
+                std::cerr.write(
+                    reinterpret_cast<const char*>(
+                        buffer.data()),
+                    read_size);
+
+            } while (read_size > 0);
+            
             std::cerr << std::endl;
         }
     }
@@ -89,7 +70,7 @@ public:
         send_request(
             common::command_codes::LOG,
             reinterpret_cast<const uint8_t* const>(message.c_str()),
-            message.size());
+            static_cast<uint32_t>(message.size()));
     }
 
     void dump_messages()

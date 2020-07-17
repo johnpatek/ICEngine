@@ -76,6 +76,7 @@ void unpack_response_header(
     uint8_t * const status, 
     uint32_t * const length);
 
+
 ice::native_socket_t open_socket(
     int peer_type, 
     const char * const host, 
@@ -83,4 +84,39 @@ ice::native_socket_t open_socket(
 
 void close_socket(ice::native_socket_t sock);
 
+void read_request_header(
+    ice::ssl_socket & socket, 
+    request_header * const header);
+
+void write_request_header(
+    ice::ssl_socket & socket, 
+    const request_header * const header);
+
+void read_response_header(
+    ice::ssl_socket & socket, 
+    response_header * const header);
+
+void write_response_header(
+    ice::ssl_socket & socket, 
+    const response_header * const header);
+
+uint32_t read_request_body(
+    ice::ssl_socket & socket, 
+    uint8_t * const buffer, 
+    uint32_t length);
+
+uint32_t read_response_body(
+    ice::ssl_socket & socket, 
+    uint8_t * const buffer, 
+    uint32_t length);
+
+uint32_t write_request_body(
+    ice::ssl_socket & socket, 
+    const uint8_t * const buffer, 
+    uint32_t length);
+
+uint32_t write_response_body(
+    ice::ssl_socket & socket, 
+    const uint8_t * const buffer, 
+    uint32_t length);
 }

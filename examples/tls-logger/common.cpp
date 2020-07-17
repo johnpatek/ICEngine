@@ -13,7 +13,7 @@ uint32_t common::timestamp()
 uint32_t common::file_size(const std::string path)
 {
     std::ifstream file(path, std::ios::binary | std::ios::ate);
-    return file.tellg();
+    return static_cast<uint32_t>(file.tellg());
 }
 
 void common::pack_request_header(
@@ -73,6 +73,54 @@ void common::unpack_response_header(
         *length = header.length;
     }
 }
+
+void common::read_request_header(
+    ice::ssl_socket & socket, 
+    common::request_header * const header)
+{
+    if(socket.read(
+        reinterpret_cast<uint8_t* const>(header),
+        common::REQUEST_HEADER_SIZE) < 0)
+    {
+        throw std::runtime_error("Failed to read request header");
+    }
+}
+
+void common::write_request_header(
+    ice::ssl_socket & socket, 
+    const common::request_header * const header)
+{
+    if(socket.write(
+        reinterpret_cast<const uint8_t* const>(header),
+        common::REQUEST_HEADER_SIZE) < 0)
+    {
+        throw std::runtime_error("Failed to write request header");
+    }
+}
+
+void common::read_response_header(
+    ice::ssl_socket & socket, 
+    common::response_header * const header)
+{
+    if(socket.read(
+        reinterpret_cast<uint8_t* const>(header),
+        common::RESPONSE_HEADER_SIZE) < 0)
+    {
+        throw std::runtime_error("Failed to read response header");    
+    }
+}
+
+void common::write_response_header(
+    ice::ssl_socket & socket, 
+    const common::response_header * const header)
+{
+    if(socket.write(reinterpret_cast<const uint8_t * const>(
+        header),common::RESPONSE_HEADER_SIZE) < 0)
+    {
+        throw std::runtime_error("Failed to write response header");
+    }
+}
+
 
 ice::native_socket_t common::open_socket(
     int peer_type, 
@@ -136,4 +184,81 @@ void common::close_socket(ice::native_socket_t sock)
 #else
     close(sock);
 #endif
+}
+
+
+static uint32_t read_body(
+    ice::ssl_socket & socket, 
+    uint8_t * const buffer, 
+    uint32_t length, 
+    const std::string& error_message);
+
+static uint32_t write_body(
+    ice::ssl_socket & socket, 
+    const uint8_t * const buffer, 
+    uint32_t length,
+    const std::string& error_message);
+
+uint32_t common::read_request_body(
+    ice::ssl_socket & socket, 
+    uint8_t * const buffer, 
+    uint32_t length)
+{
+    return read_body(socket,buffer,length,
+        "Failed to read request body");
+}
+
+uint32_t common::read_response_body(
+    ice::ssl_socket & socket, 
+    uint8_t * const buffer, 
+    uint32_t length)
+{
+    return read_body(socket,buffer,length,
+        "Failed to read response body");
+}
+
+uint32_t common::write_request_body(
+    ice::ssl_socket & socket, 
+    const uint8_t * const buffer, 
+    uint32_t length)
+{
+    return write_body(socket,buffer,length,
+        "Failed to write request body");
+}
+
+uint32_t common::write_response_body(
+    ice::ssl_socket & socket, 
+    const uint8_t * const buffer, 
+    uint32_t length)
+{
+    return write_body(socket,buffer,length,
+        "Failed to write response body");
+}
+
+static uint32_t read_body(
+    ice::ssl_socket & socket, 
+    uint8_t * const buffer, 
+    uint32_t length,
+    const std::string& error_message)
+{
+    int32_t result = socket.read(buffer,length);
+    if(result < 0)
+    {
+        throw std::runtime_error(error_message.c_str());
+    }
+    return static_cast<uint32_t>(result);
+}
+
+static uint32_t write_body(
+    ice::ssl_socket & socket, 
+    const uint8_t * const buffer, 
+    uint32_t length,
+    const std::string& error_message)
+{
+    int32_t result = socket.write(buffer,length);
+    if(result < 0)
+    {
+        throw std::runtime_error(error_message.c_str());
+    }
+    return static_cast<uint32_t>(result);
 }

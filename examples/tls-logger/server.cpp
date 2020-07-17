@@ -1,7 +1,6 @@
 #include "common.h"
 #include "ice-engine/argparse.h"
 
-
 class server
 {
 private:
@@ -36,24 +35,23 @@ private:
         if(file.good() || length > 0)
         {
             response_header.status = common::status_codes::OK;
+            
             buffer.resize(length);
-            if(client_socket.read(buffer.data(), static_cast<uint32_t>(buffer.size())) < 0)
-            {
-                throw std::runtime_error("Failed to read request body");
-            }
+            
+            common::read_request_body(client_socket,
+                buffer.data(), 
+                static_cast<uint32_t>(buffer.size()));
+
             file.write(reinterpret_cast<const char*>(buffer.data()),
                 buffer.size());
+            
             file << std::endl;
         }
         
-        if(client_socket.write(reinterpret_cast<const uint8_t * const>(
-            &response_header),common::RESPONSE_HEADER_SIZE) < 0)
-        {
-            throw std::runtime_error("Failed to write response header");
-        }            
+        common::write_response_header(
+            client_socket,&response_header);           
     }
     
-
     /**
      * Assignment 2: make sure the file is locked during this 
      * operation so only one thread can access it.
@@ -70,51 +68,54 @@ private:
         if(file_size > 0)
         {
             std::fstream file(_file_path, std::ios::in);
-            response_header.status = common::status_codes::OK;
-            response_header.length = common::file_size(_file_path);
             
-            if(client_socket.write(reinterpret_cast<const uint8_t * const>(
-                &response_header),common::RESPONSE_HEADER_SIZE) < 0)
-            {
-                throw std::runtime_error("Failed to write response header");
-            }   
+            common::pack_response_header(
+                &response_header,
+                common::status_codes::OK, 
+                file_size);
+            
+            common::write_response_header(
+                client_socket, 
+                &response_header);
             
             while(file.good())
             {
                 file.read(
                     reinterpret_cast<char*>(
                         buffer.data()),
-                    buffer.size());
+                    static_cast<uint32_t>(buffer.size()));
 
-                if(client_socket.write(buffer.data(), file.gcount()) < 0)
-                {
-                    throw std::runtime_error("Failed to write response body");
-                }
+                common::write_response_body(client_socket, 
+                    buffer.data(), file.gcount());
             }
         }
         else
         {
-            response_header.status = common::status_codes::ERR;
-            response_header.length = 0;
-            if(client_socket.write(reinterpret_cast<const uint8_t * const>(
-                &response_header),common::RESPONSE_HEADER_SIZE) < 0)
-            {
-                throw std::runtime_error("Failed to write response header");
-            }   
-            
+            error_response(client_socket, "No entries available");
         }
+    }
+
+    void error_response(ice::ssl_socket & client_socket, 
+        const std::string & message)
+    {
+        common::response_header response_header;
+        uint32_t message_size = static_cast<uint32_t>(message.size());
+        
+        common::pack_response_header(&response_header,
+            common::status_codes::ERR, message_size);
+
+        common::write_response_header(client_socket, &response_header);
+
+        common::write_response_body(client_socket,
+            reinterpret_cast<const uint8_t * const>(message.data()),
+            message_size);
     }
     
     void handle_request(ice::ssl_socket & client_socket)
     {
         common::request_header request_header;
 
-        if(client_socket.read(
-            reinterpret_cast<uint8_t*>(&request_header),
-            common::REQUEST_HEADER_SIZE) < 0)
-        {
-            throw std::runtime_error("Failed to read request header");
-        }
+        common::read_request_header(client_socket,&request_header);
 
         if(request_header.command == common::command_codes::LOG)
         {
@@ -213,10 +214,12 @@ void server_main(
 
 int main(const int argc, const char ** argv)
 {
-    ice::argument_parser parser("server","A simple tcp server example.");
+    ice::argument_parser parser("server",
+        "A simple tls logger example.");
     parser.add_argument("-p","--port","port",true);
     parser.add_argument("-c","--cert","cert",true);
     parser.add_argument("-k","--key","key",true);
+    // parser.add_argument("-t","--threads","threads",true);
     parser.enable_help();
 
 
