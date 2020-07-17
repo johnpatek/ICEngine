@@ -13,6 +13,13 @@ private:
     // research mutex
     std::mutex _file_lock;
 
+
+    /**
+     * Assignment 2: make sure the file is locked during this 
+     * operation so only one thread can access it.
+     * 
+     * recommended solutions: std::unique_lock
+     */
     void log_entry(
         ice::ssl_socket & client_socket, 
         uint32_t timestamp, 
@@ -46,6 +53,13 @@ private:
         }            
     }
     
+
+    /**
+     * Assignment 2: make sure the file is locked during this 
+     * operation so only one thread can access it.
+     * 
+     * recommended solutions: std::unique_lock
+     */
     void dump_entries(ice::ssl_socket & client_socket)
     {
         // research mutex
@@ -132,6 +146,13 @@ public:
         std::fstream file_stream(_file_path, std::ios::out);
     }
 
+    /**
+     * Assignment 3: rewrite the function so the server is accepting
+     * connections on multiple threads
+     * 
+     * recommended solutions: add std::vector as a class member
+     * and add threads to it.
+     */
     void start()
     {
         listen(_srv,3);
