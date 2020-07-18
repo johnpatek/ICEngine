@@ -14,7 +14,7 @@ private:
 
 
     /**
-     * Assignment 2: make sure the file is locked during this 
+     * Assignment 1: make sure the file is locked during this 
      * operation so only one thread can access it.
      * 
      * recommended solutions: std::unique_lock
@@ -211,6 +211,15 @@ static void server_main(
     const std::string& key,
     const uint16_t port);
 
+
+/**
+     * Assignment 4: Add a command line flag to specify the number of 
+     * threads
+     * 
+     * recommended solutions: use the exists function and get 
+     * function and also update the server class and server_main
+     * accordingly
+     */
 int main(const int argc, const char ** argv)
 {
     ice::argument_parser parser("server",
