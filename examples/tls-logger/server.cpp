@@ -14,7 +14,7 @@ private:
 
 
     /**
-     * Assignment 1: make sure the file is locked during this 
+     * Assignment 2: make sure the file is locked during this 
      * operation so only one thread can access it.
      * 
      * recommended solutions: std::unique_lock
@@ -53,7 +53,7 @@ private:
     }
     
     /**
-     * Assignment 2: make sure the file is locked during this 
+     * Assignment 3: make sure the file is locked during this 
      * operation so it can only accept read operations.
      * 
      * recommended solutions: std::shared_lock
@@ -147,7 +147,7 @@ public:
     }
 
     /**
-     * Assignment 3: rewrite the function so the server is accepting
+     * Assignment 4: rewrite the function so the server is accepting
      * connections on multiple threads
      * 
      * recommended solutions: add std::vector as a class member
@@ -213,13 +213,13 @@ static void server_main(
 
 
 /**
-     * Assignment 4: Add a command line flag to specify the number of 
-     * threads
-     * 
-     * recommended solutions: use the exists function and get 
-     * function and also update the server class and server_main
-     * accordingly
-     */
+ * Assignment 1: Add a command line flag to specify the number of 
+ * threads
+ * 
+ * recommended solutions: use the exists function and get 
+ * function and also update the server class and server_main
+ * accordingly
+ */
 int main(const int argc, const char ** argv)
 {
     ice::argument_parser parser("server",
