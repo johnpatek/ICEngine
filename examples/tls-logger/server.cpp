@@ -54,9 +54,9 @@ private:
     
     /**
      * Assignment 2: make sure the file is locked during this 
-     * operation so only one thread can access it.
+     * operation so it can only accept read operations.
      * 
-     * recommended solutions: std::unique_lock
+     * recommended solutions: std::shared_lock
      */
     void dump_entries(ice::ssl_socket & client_socket)
     {
@@ -86,7 +86,7 @@ private:
                     static_cast<uint32_t>(buffer.size()));
 
                 common::write_response_body(client_socket, 
-                    buffer.data(), file.gcount());
+                    buffer.data(), static_cast<uint32_t>(file.gcount()));
             }
         }
         else
@@ -128,8 +128,7 @@ private:
         }
         else
         {
-            // Should be unreachable
-            // Figure out how to write an error packet
+            error_response(client_socket,"Invalid request command");
         }
     }
 
@@ -207,7 +206,7 @@ public:
 };
 
 
-void server_main(
+static void server_main(
     const std::string& cert,
     const std::string& key,
     const uint16_t port);
@@ -257,34 +256,37 @@ int main(const int argc, const char ** argv)
     return 0;
 }
 
-bool running;
+static bool running;
 
-void signal_callback_handler(int signum);
+#ifdef _WIN32
+static BOOL WINAPI console_ctrl_handler(DWORD dwCtrlType)
+{
+  running = false;
+  return TRUE;
+}
+#else
+// TODO: implement for Unix
+#endif
 
-void server_main(
+static void server_main(
     const std::string& cert,
     const std::string& key,
     const uint16_t port)
 {
     running = true;
     server log_server(cert, key, port);
-    
-    signal(SIGINT, signal_callback_handler);
-    
+#ifdef _WIN32 
+    SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
+#else
+// TODO: implement for Unix
+#endif    
     log_server.start();
     
     while(running)
     {
-        std::this_thread::yield();
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(300));
     }
     
     log_server.stop();
-}
-
-void signal_callback_handler(int signum)
-{
-    if(signum == CTRL_C_EVENT)
-    {
-        running = false;
-    }
 }

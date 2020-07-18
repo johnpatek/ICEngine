@@ -4,6 +4,7 @@
 #include<mutex>
 #include <signal.h>
 #include <thread>
+#include <shared_mutex>
 
 namespace common
 {

@@ -79,11 +79,11 @@ public:
     }
 };
 
-void client_main(
+static void client_main(
     const std::string& address, 
     const uint16_t port);
 
-void print_help();
+static void print_help();
 
 
 int main(const int argc, const char ** argv)
@@ -116,7 +116,7 @@ int main(const int argc, const char ** argv)
     return 0;
 }
 
-void client_main(
+static void client_main(
     const std::string& address, 
     const uint16_t port)
 {
@@ -167,7 +167,7 @@ void client_main(
 #endif
 }
 
-void print_help()
+static void print_help()
 {
     std::cerr << "LOG  - Log a message on the server" << std::endl
               << "DUMP - Dump messages from the server" << std::endl

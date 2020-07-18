@@ -7,7 +7,8 @@ void common::zero_memory(uint8_t * const buf, uint32_t len)
 
 uint32_t common::timestamp()
 {
-    return 0;
+    return static_cast<uint32_t>(
+        std::chrono::system_clock::now().time_since_epoch().count());
 }
 
 uint32_t common::file_size(const std::string path)
