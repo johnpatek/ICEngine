@@ -1,6 +1,8 @@
 add_executable(
     tls-client
-    client.cpp)
+    client.cpp
+    echo.h
+    echo.cpp)
 
 target_include_directories(
     tls-client

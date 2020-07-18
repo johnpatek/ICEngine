@@ -14,7 +14,7 @@ private:
 
 
     /**
-     * Assignment 2: make sure the file is locked during this 
+     * Assignment 3: make sure the file is locked during this 
      * operation so only one thread can access it.
      * 
      * recommended solutions: std::unique_lock
@@ -53,7 +53,7 @@ private:
     }
     
     /**
-     * Assignment 3: make sure the file is locked during this 
+     * Assignment 4: make sure the file is locked during this 
      * operation so it can only accept read operations.
      * 
      * recommended solutions: std::shared_lock
@@ -147,7 +147,7 @@ public:
     }
 
     /**
-     * Assignment 4: rewrite the function so the server is accepting
+     * Assignment 2: rewrite the function so the server is accepting
      * connections on multiple threads
      * 
      * recommended solutions: add std::vector as a class member
@@ -274,7 +274,10 @@ static BOOL WINAPI console_ctrl_handler(DWORD dwCtrlType)
   return TRUE;
 }
 #else
-// TODO: implement for Unix
+void signal_handler(int signal)
+{
+    running = false;
+}
 #endif
 
 static void server_main(
@@ -287,15 +290,21 @@ static void server_main(
 #ifdef _WIN32 
     SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 #else
-// TODO: implement for Unix
+    sigaction sigaction_handler;
+    sigaction_handler.sa_handler = signal_handler;
+    sigemptyset(&sigaction_handler.sa_mask);
+    sigaction_handler.sa_flags = 0;
 #endif    
     log_server.start();
-    
+
+#ifdef _WIN32    
     while(running)
     {
         std::this_thread::sleep_for(
             std::chrono::milliseconds(300));
     }
-    
+#else
+    pause();
+#endif
     log_server.stop();
 }
