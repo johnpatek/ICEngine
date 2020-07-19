@@ -260,6 +260,8 @@ void echo::client::send_request(
 
     echo::pack_request_header(&request_header,command,length);
 
+    client_socket.connect();
+
     echo::write_request_header(client_socket,&request_header);
 
     echo::write_request_body(client_socket,buffer,length);
@@ -324,11 +326,15 @@ void echo::client::reverse_message(
 void echo::server::handle_request(ice::ssl_socket & client_socket)
 {
     echo::request_header request_header;
-    echo::request_header response_header;
+    echo::response_header response_header;
     std::vector<uint8_t> request_body;
-    uint32_t request_length;
+    uint8_t response_status;
+    uint8_t * response_buffer;
+    uint32_t request_length, response_length;
 
     echo::read_request_header(client_socket,&request_header);
+
+    response_status = echo::status_codes::OK;
 
     request_length = request_header.length;
 
@@ -344,6 +350,7 @@ void echo::server::handle_request(ice::ssl_socket & client_socket)
         switch(request_header.command)
         {
             case echo::command_codes::ECH:
+                response_buffer = request_body.data();
                 break;
             case echo::command_codes::CAP:
                 for(uint8_t& byte : request_body)
@@ -354,26 +361,47 @@ void echo::server::handle_request(ice::ssl_socket & client_socket)
                         byte - ('a' - 'A');
                     }
                 }
+                response_buffer = request_body.data();
                 break;
             case echo::command_codes::SCR:
                 std::shuffle(
                     request_body.begin(),
                     request_body.end(),
                     _random_engine);
+                response_buffer = request_body.data();
                 break;
             case echo::command_codes::REV:
                 std::reverse(
                     request_body.begin(),
                     request_body.end());
+                response_buffer = request_body.data();
                 break;
             default:
-                // TODO: add error handling for invalid command code
+                std::string message("Invalid command code");
+                response_status = echo::status_codes::ERR;
+                response_buffer = reinterpret_cast<uint8_t*>(message.data());
+                response_length = static_cast<uint32_t>(message.length());
         }
     }
     else
     {
-
+        std::string message("Empty request");
+        response_status = echo::status_codes::ERR;
+        response_buffer = reinterpret_cast<uint8_t*>(message.data());
+        response_length = static_cast<uint32_t>(message.length());
     }
+
+    echo::pack_response_header(
+        &response_header,
+        response_status,
+        response_length);
+
+    echo::write_response_header(client_socket,&response_header);
+
+    echo::write_response_body(
+        client_socket,
+        response_buffer,
+        response_length);
 }
 
 echo::server::server(
@@ -415,6 +443,7 @@ void echo::server::run()
         if(native_socket >= 0)
         {
             ice::ssl_socket client_socket(_ctx,native_socket);
+            client_socket.accept();
             handle_request(client_socket);
         }
         else

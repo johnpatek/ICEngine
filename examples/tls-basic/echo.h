@@ -135,26 +135,6 @@ private:
 
     void handle_request(ice::ssl_socket & client_socket);
 
-    void on_echo(
-        ice::ssl_socket & client_socket, 
-        uint8_t * const buffer, 
-        const uint32_t length);
-
-    void on_capitalize(
-        ice::ssl_socket & client_socket, 
-        uint8_t * const buffer, 
-        const uint32_t length);
-
-    void on_scramble(
-        ice::ssl_socket & client_socket, 
-        uint8_t * const buffer, 
-        const uint32_t length);
-
-    void on_reverse(
-        ice::ssl_socket & client_socket, 
-        uint8_t * const buffer, 
-        const uint32_t length);
-
 public:
     server(
         const std::string& cert_file, 
