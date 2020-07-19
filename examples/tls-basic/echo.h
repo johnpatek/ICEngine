@@ -1,7 +1,10 @@
 #include <ice-engine/network.h>
 #include <array>
+#include <random>
 #include <thread>
 #include <vector>
+
+#include <cstring>
 
 namespace echo
 {
@@ -57,22 +60,17 @@ void read_request_header(
 
 void write_request_header(
     ice::ssl_socket & client_socket, 
-    const request_header * const client_header);
+    const request_header * const header);
 
 void read_response_header(
     ice::ssl_socket & client_socket, 
-    response_header * const client_header);
+    response_header * const header);
 
 void write_response_header(
-    ice::ssl_socket & socket, 
-    const response_header * const client_header);
+    ice::ssl_socket & client_socket, 
+    const response_header * const header);
 
 uint32_t read_request_body(
-    ice::ssl_socket & client_socket, 
-    uint8_t * const buffer, 
-    uint32_t length);
-
-uint32_t read_response_body(
     ice::ssl_socket & client_socket, 
     uint8_t * const buffer, 
     uint32_t length);
@@ -80,6 +78,11 @@ uint32_t read_response_body(
 uint32_t write_request_body(
     ice::ssl_socket & client_socket, 
     const uint8_t * const buffer, 
+    uint32_t length);
+
+uint32_t read_response_body(
+    ice::ssl_socket & client_socket, 
+    uint8_t * const buffer, 
     uint32_t length);
 
 uint32_t write_response_body(
@@ -92,7 +95,7 @@ class client
 private:
     std::string _host;
     uint16_t _port;
-    std::shared_ptr<ice::ssl_context> _ctx;
+    ice::ssl_context _ctx;
 
     void send_request(
         const uint8_t command, 
@@ -103,7 +106,8 @@ public:
     client(
         const std::string& host, 
         const uint16_t port);
-    ~client();
+    
+    ~client() = default;
 
     void echo_message(
         const std::string& message);
@@ -121,27 +125,49 @@ public:
 class server
 {
 private:
-    std::shared_ptr<ice::ssl_context> _ctx;
+    ice::ssl_context _ctx;
     uint16_t _port;
-    uint32_t _thread_count;
-    std::vector<std::thread> _threads;
+    ice::native_socket_t _srv;
+    std::default_random_engine _random_engine;
+    uint32_t _threads;
+    std::vector<std::thread> _thread_vector;
     bool _running;
 
-    void run();
+    void handle_request(ice::ssl_socket & client_socket);
 
-    void handle_request();
+    void on_echo(
+        ice::ssl_socket & client_socket, 
+        uint8_t * const buffer, 
+        const uint32_t length);
+
+    void on_capitalize(
+        ice::ssl_socket & client_socket, 
+        uint8_t * const buffer, 
+        const uint32_t length);
+
+    void on_scramble(
+        ice::ssl_socket & client_socket, 
+        uint8_t * const buffer, 
+        const uint32_t length);
+
+    void on_reverse(
+        ice::ssl_socket & client_socket, 
+        uint8_t * const buffer, 
+        const uint32_t length);
 
 public:
     server(
-        const std::string& key_file, 
         const std::string& cert_file, 
+        const std::string& key_file, 
         const uint16_t port, 
-        const uint32_t thread_count);
+        const uint32_t threads);
 
     ~server();
 
     void start();
 
+    void run();
+    
     void stop();
 };
 }
