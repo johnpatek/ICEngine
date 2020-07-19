@@ -1,6 +1,8 @@
 #include "common.h"
 #include "ice-engine/argparse.h"
 
+// Server class
+
 class server
 {
 private:
