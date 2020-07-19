@@ -5,12 +5,13 @@
 
 namespace echo
 {
+
 enum command_codes
 {
-    ECHO,
-    CAPITALIZE,
-    SCRAMBLE,
-    REVERSE
+    ECH,
+    CAP,
+    SCR,
+    REV
 };
 
 enum status_codes
@@ -42,8 +43,7 @@ const uint32_t RESPONSE_HEADER_SIZE = sizeof(response_header);
 
 void pack_request_header(
     request_header * const header, 
-    uint8_t command, 
-    uint32_t timestamp, 
+    uint8_t command,
     uint32_t length);
 
 void pack_response_header(
@@ -52,38 +52,38 @@ void pack_response_header(
     uint32_t length);
 
 void read_request_header(
-    ice::ssl_socket & socket, 
+    ice::ssl_socket & client_socket, 
     request_header * const header);
 
 void write_request_header(
-    ice::ssl_socket & socket, 
-    const request_header * const header);
+    ice::ssl_socket & client_socket, 
+    const request_header * const client_header);
 
 void read_response_header(
-    ice::ssl_socket & socket, 
-    response_header * const header);
+    ice::ssl_socket & client_socket, 
+    response_header * const client_header);
 
 void write_response_header(
     ice::ssl_socket & socket, 
-    const response_header * const header);
+    const response_header * const client_header);
 
 uint32_t read_request_body(
-    ice::ssl_socket & socket, 
+    ice::ssl_socket & client_socket, 
     uint8_t * const buffer, 
     uint32_t length);
 
 uint32_t read_response_body(
-    ice::ssl_socket & socket, 
+    ice::ssl_socket & client_socket, 
     uint8_t * const buffer, 
     uint32_t length);
 
 uint32_t write_request_body(
-    ice::ssl_socket & socket, 
+    ice::ssl_socket & client_socket, 
     const uint8_t * const buffer, 
     uint32_t length);
 
 uint32_t write_response_body(
-    ice::ssl_socket & socket, 
+    ice::ssl_socket & client_socket, 
     const uint8_t * const buffer, 
     uint32_t length);
 
@@ -93,19 +93,29 @@ private:
     std::string _host;
     uint16_t _port;
     std::shared_ptr<ice::ssl_context> _ctx;
+
+    void send_request(
+        const uint8_t command, 
+        const uint8_t * const buffer, 
+        const uint32_t length);
+
 public:
     client(
         const std::string& host, 
         const uint16_t port);
     ~client();
 
-    void echo_message(const std::string& message);
+    void echo_message(
+        const std::string& message);
 
-    void capitalize_message(const std::string& message);
+    void capitalize_message(
+        const std::string& message);
 
-    void scramble_message(const std::string& message);
+    void scramble_message(
+        const std::string& message);
 
-    void reverse_message(const std::string& message);
+    void reverse_message(
+        const std::string& message);
 };
 
 class server
@@ -115,6 +125,12 @@ private:
     uint16_t _port;
     uint32_t _thread_count;
     std::vector<std::thread> _threads;
+    bool _running;
+
+    void run();
+
+    void handle_request();
+
 public:
     server(
         const std::string& key_file, 
@@ -124,7 +140,8 @@ public:
 
     ~server();
 
-    
+    void start();
 
+    void stop();
 };
 }
