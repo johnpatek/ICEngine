@@ -9,12 +9,13 @@ static void * init_window(
     uint32_t h,
     uint8_t flags)
 {
-    return static_cast<void*>(SDL_CreateWindow(title,x,y,w,h,flags));
+    // return static_cast<void*>(SDL_CreateWindow(title,x,y,w,h,flags));
+    return NULL;
 }
 
 static void window_deleter(void * data)
 {
-    SDL_DestroyWindow(static_cast<SDL_Window*>(data));
+    // SDL_DestroyWindow(static_cast<SDL_Window*>(data));
 }
 
 ice::window::window(
@@ -32,7 +33,7 @@ ice::window::window(
 
     if(window_data == nullptr)
     {
-        throw std::runtime_error(SDL_GetError());
+        // throw std::runtime_error(SDL_GetError());
     }
 
     _window_data = std::shared_ptr<void>(window_data,window_deleter);

@@ -290,7 +290,7 @@ static void server_main(
 #ifdef _WIN32 
     SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 #else
-    sigaction sigaction_handler;
+    struct sigaction sigaction_handler;
     sigaction_handler.sa_handler = signal_handler;
     sigemptyset(&sigaction_handler.sa_mask);
     sigaction_handler.sa_flags = 0;

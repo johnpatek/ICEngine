@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <thread>
 #include <shared_mutex>
+#include <cstring>
 
 namespace common
 {
