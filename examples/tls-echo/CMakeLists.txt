@@ -1,35 +1,35 @@
 add_executable(
-    tls-client
+    echo-client
     client.cpp
     echo.h
     echo.cpp)
 
 target_include_directories(
-    tls-client
+    echo-client
     PUBLIC 
     ${PROJ_INCLUDE}
     ${COMMON_INCLUDE})
 
 target_link_libraries(
-    tls-client 
+    echo-client 
     PUBLIC
     ice-engine-sdk
     ${PTHREAD})
 
 add_executable(
-    tls-server
+    echo-server
     server.cpp
     echo.h
     echo.cpp)
 
 target_include_directories(
-    tls-server
+    echo-server
     PUBLIC 
     ${PROJ_INCLUDE}
     ${COMMON_INCLUDE})
 
 target_link_libraries(
-    tls-server 
+    echo-server 
     PUBLIC
     ice-engine-sdk
     ${PTHREAD})
