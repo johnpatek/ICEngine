@@ -1,11 +1,7 @@
 #include "ice-engine/argparse.h"
-#include "ice-engine/network.h"
-#include <array>
+#include "echo.h"
 
-const uint32_t BUFFER_SIZE = 1024;
-const std::string CLIENT_MESSAGE("Message from client\n");
-
-void client_main(
+static void client_main(
     const std::string& address, 
     const uint16_t port);
 
@@ -30,7 +26,6 @@ int main(const int argc, const char ** argv)
         {
             std::cerr << "Client Error: " << e.what() << std::endl;
         }
-            
     }
     else
     {
@@ -40,66 +35,21 @@ int main(const int argc, const char ** argv)
     return 0;
 }
 
-void client_main(
+static void prompt_message(std::string& buffer);
+
+static void client_main(
     const std::string& address, 
     const uint16_t port)
 {
-    ice::native_socket_t cli;
-    struct sockaddr_in addr;
-    socklen_t len;
-    ice::ssl_context ctx(ice::CLIENT_TCP_SOCKET);
-    std::array<uint8_t,BUFFER_SIZE> buffer;
+    echo::client client(address,port);
+    std::string command_buffer, message_buffer;
+    bool client_loop(true);
 
-    cli = socket(PF_INET,SOCK_STREAM,0);
 
-    if(cli < 0)
-    {
-        throw std::runtime_error("Socket failed");
-    }
+}
 
-    addr = {0};
-    addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = inet_addr(address.c_str());
-    addr.sin_port = htons(port);
-    len = sizeof(addr);
 
-    if(connect(cli,reinterpret_cast<struct sockaddr*>(&addr),len) < 0)
-    {
-        throw std::runtime_error("Connect failed");    
-    }
-
-    ice::ssl_socket sock(ctx,cli);
-
-    if(sock.connect() < 0)
-    {
-        throw std::runtime_error("SSL Connect failed");
-    }
-
-    if(sock.write(
-        reinterpret_cast<const uint8_t* const>(
-            CLIENT_MESSAGE.data()),
-        CLIENT_MESSAGE.size()) < 0)
-    {    
-        throw std::runtime_error("Write failed");
-    }
-
-    std::cerr << "Message sent." << std::endl;
-
-    uint32_t read_size = sock.read(
-        buffer.data(),
-        buffer.size());
-
-    if(read_size < 0)
-    {    
-        throw std::runtime_error("Read failed");
-    }
-
-    std::cerr << "Message recieved: ";
-
-    std::cerr.write(
-        reinterpret_cast<const char* const>(
-            buffer.data()),
-        read_size);
-
-    std::cerr << std::endl;
+static void prompt_message(std::string buffer)
+{
+    
 }

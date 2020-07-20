@@ -323,6 +323,10 @@ void echo::client::reverse_message(
         message.length());
 }
 
+static void error_response(
+    ice::ssl_socket & client_socket, 
+    const std::string& error_message);
+
 void echo::server::handle_request(ice::ssl_socket & client_socket)
 {
     echo::request_header request_header;
@@ -331,6 +335,8 @@ void echo::server::handle_request(ice::ssl_socket & client_socket)
     uint8_t response_status;
     uint8_t * response_buffer;
     uint32_t request_length, response_length;
+    std::string error_message;
+    bool error(false);
 
     echo::read_request_header(client_socket,&request_header);
 
@@ -347,6 +353,8 @@ void echo::server::handle_request(ice::ssl_socket & client_socket)
             request_body.data(),
             request_length);
         
+        response_length = request_length;
+
         switch(request_header.command)
         {
             case echo::command_codes::ECH:
@@ -358,7 +366,7 @@ void echo::server::handle_request(ice::ssl_socket & client_socket)
                     if((byte >= (uint8_t)'a') 
                         || (byte <= (uint8_t)'z'))
                     {
-                        byte - ('a' - 'A');
+                        byte -= ('a' - 'A');
                     }
                 }
                 response_buffer = request_body.data();
@@ -377,30 +385,56 @@ void echo::server::handle_request(ice::ssl_socket & client_socket)
                 response_buffer = request_body.data();
                 break;
             default:
-                std::string message("Invalid command code");
-                response_status = echo::status_codes::ERR;
-                response_buffer = reinterpret_cast<uint8_t*>(message.data());
-                response_length = static_cast<uint32_t>(message.length());
+                error_message = "Invalid command code";
+                error = true;
         }
     }
     else
     {
-        std::string message("Empty request");
-        response_status = echo::status_codes::ERR;
-        response_buffer = reinterpret_cast<uint8_t*>(message.data());
-        response_length = static_cast<uint32_t>(message.length());
+        error_message = "Empty request";
+        error = true;
     }
 
+    if(!error)
+    {
+        echo::pack_response_header(
+            &response_header,
+            response_status,
+            response_length);
+
+        echo::write_response_header(client_socket,&response_header);
+
+        echo::write_response_body(
+            client_socket,
+            response_buffer,
+            response_length);
+    }
+    else
+    {
+        error_response(client_socket,error_message);
+    }
+}
+
+static void error_response(
+    ice::ssl_socket & client_socket, 
+    const std::string& error_message)
+{
+    echo::response_header response_header;
+    uint32_t response_length;
+
+    response_length = static_cast<uint32_t>(
+        error_message.length());
+
     echo::pack_response_header(
-        &response_header,
-        response_status,
+        &response_header, 
+        echo::status_codes::ERR, 
         response_length);
 
     echo::write_response_header(client_socket,&response_header);
 
     echo::write_response_body(
         client_socket,
-        response_buffer,
+        reinterpret_cast<const uint8_t* const>(error_message.data()),
         response_length);
 }
 
