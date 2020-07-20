@@ -185,7 +185,7 @@ static ice::native_socket_t open_socket(
     {
         addr = {0};
         addr.sin_family = AF_INET;
-        addr.sin_addr.s_addr = inet_addr(host);
+        inet_pton(AF_INET,host,&addr.sin_addr.s_addr);
         addr.sin_port = htons(port);
         len = sizeof(addr);
 
@@ -293,7 +293,7 @@ void echo::client::echo_message(
     send_request(
         echo::command_codes::ECH,
         reinterpret_cast<const uint8_t * const>(message.data()),
-        message.length());
+        static_cast<uint32_t>(message.length()));
 }
 
 void echo::client::capitalize_message(
@@ -302,7 +302,7 @@ void echo::client::capitalize_message(
     send_request(
         echo::command_codes::CAP,
         reinterpret_cast<const uint8_t * const>(message.data()),
-        message.length());
+        static_cast<uint32_t>(message.length()));
 }
 
 void echo::client::scramble_message(
@@ -311,7 +311,7 @@ void echo::client::scramble_message(
     send_request(
         echo::command_codes::SCR,
         reinterpret_cast<const uint8_t * const>(message.data()),
-        message.length());
+        static_cast<uint32_t>(message.length()));
 }
 
 void echo::client::reverse_message(
@@ -320,7 +320,7 @@ void echo::client::reverse_message(
     send_request(
         echo::command_codes::REV,
         reinterpret_cast<const uint8_t * const>(message.data()),
-        message.length());
+        static_cast<uint32_t>(message.length()));
 }
 
 static void error_response(
@@ -446,6 +446,7 @@ echo::server::server(
 {
     _port = port;
     _threads = threads;
+    _srv = open_socket(SERVER,nullptr,_port);
 }
 
 echo::server::~server()
@@ -458,6 +459,10 @@ echo::server::~server()
 
 void echo::server::start()
 {
+    if(listen(_srv, _threads * 2) < 0)
+    {
+        throw std::runtime_error("Failed to listen on socket");
+    }
     while(_thread_vector.size() < _threads)
     {
         _thread_vector.push_back(std::thread([this]

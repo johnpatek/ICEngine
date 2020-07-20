@@ -17,7 +17,7 @@ int main(const int argc, const char ** argv)
     parser.add_argument("-p","--port","port",true);
     parser.add_argument("-c","--cert","cert",true);
     parser.add_argument("-k","--key","key",true);
-    parser.add_argument("-t","--threads","threads",true);
+    parser.add_argument("-t","--threads","threads",false);
     parser.enable_help();
     uint32_t threads = std::thread::hardware_concurrency();
 
@@ -83,6 +83,14 @@ static void server_main(
         port, 
         threads);
 
+#ifdef _WIN32 
+    SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
+#else
+    struct sigaction sigaction_handler;
+    sigaction_handler.sa_handler = signal_handler;
+    sigemptyset(&sigaction_handler.sa_mask);
+    sigaction_handler.sa_flags = 0;
+#endif    
     server.start();
 
 #ifdef _WIN32
