@@ -18,7 +18,9 @@ target_link_libraries(
 
 add_executable(
     tls-server
-    server.cpp)
+    server.cpp
+    echo.h
+    echo.cpp)
 
 target_include_directories(
     tls-server
