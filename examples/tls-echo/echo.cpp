@@ -445,7 +445,7 @@ echo::server::server(
     const uint32_t threads) : _ctx(
         ice::SERVER_TCP_SOCKET,
         cert_file,key_file), _random_engine(
-        std::random_device())
+        std::random_device()())
 {
     _port = port;
     _threads = threads;
