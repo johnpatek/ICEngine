@@ -91,27 +91,29 @@ namespace ice
     };
 
 
-    typedef std::function<void(ssl_socket)> request_handler_t;
+    typedef std::function<void(ssl_socket&,const struct sockaddr* const,int32_t)> request_handler_t;
 
     class tls_server
     {
     private:
-        uint32_t _thread_count;
         std::vector<std::thread> _threads;  
         request_handler_t _request_handler;
         bool _running;
         native_socket_t _socket;
+        ssl_context _ctx;
     public:
         tls_server(
             const std::string& cert_path,
             const std::string& key_path,
             const request_handler_t& request_handler,
-            const uint32_t threads);
+            const uint16_t port);
         
         ~tls_server();
 
-        void start();
-
+        void start(const uint32_t threads);
+        
+        void run();
+        
         void stop();
     };
 

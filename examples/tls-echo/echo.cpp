@@ -466,6 +466,7 @@ void echo::server::start()
     {
         throw std::runtime_error("Failed to listen on socket");
     }
+    _running = true;
     while(_thread_vector.size() < _threads)
     {
         _thread_vector.push_back(std::thread([this]
