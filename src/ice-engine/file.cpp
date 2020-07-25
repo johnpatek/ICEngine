@@ -96,6 +96,7 @@ static void * open_file(const std::string& path, const uint8_t flags)
     has_error = (file_descriptor < 0);
     open = !has_error;
     error_message = (has_error)?"Failed to open file":"";
+    
 }
 
 static int close_file(void * handle)
@@ -103,15 +104,22 @@ static int close_file(void * handle)
     bool error;
     int result;
     file_handle * handle_ptr = reinterpret_cast<file_handle*>(handle);
+    error = (handle_ptr == nullptr) 
+        || !(handle_ptr->open);
+    if(!error)
+    {
 #ifdef _WIN32    
-    result = ((handle_ptr == nullptr) 
-        || !(handle_ptr->open))?-1:_close(
-            handle_ptr->file_descriptor);
+        result = _close(handle_ptr->file_descriptor);
 #else    
-    result = ((handle_ptr == nullptr) 
-        || !(handle_ptr->open))?-1:close(
-            handle_ptr->file_descriptor);
+        result = close(handle_ptr->file_descriptor);
 #endif
+        handle_ptr->open = false;
+    }
+    else
+    {
+        result = -1;
+    }
+    return -1;
 }
 
 static void file_deleter(void * handle)
