@@ -1,5 +1,6 @@
 #ifndef MEMORY_H
 #define MEMORY_H
+#include "common.h"
 #include <cstdint>
 #include <array>
 #include <memory>

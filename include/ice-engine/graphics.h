@@ -3,6 +3,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include "common.h"
 #ifdef _WIN32
 #undef WIN32_HIGH_RES_TIMING
 #include <windows.h>
