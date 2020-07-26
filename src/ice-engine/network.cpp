@@ -190,7 +190,7 @@ void ice::tls_server::run()
 {
     ice::native_socket_t native_socket;
     struct sockaddr_in addr;
-    int32_t addr_len;
+    unsigned int addr_len;
     bool loop(true);
     while(loop)
     {
