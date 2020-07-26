@@ -7,7 +7,13 @@ int main(const int argc, const char ** argv)
 
     ice::init_graphics(ice::init_flags::ICE_INIT_VIDEO);
 
-    window = std::make_shared<ice::window>("Window Example",20,20,300,300,0);
+    window = std::make_shared<ice::window>(
+        "Window Example",
+        50,
+        50,
+        300,
+        300,
+        ice::window_flags::ICE_WINDOW_RESIZABLE);
 
     std::this_thread::sleep_for(std::chrono::seconds(5));
 

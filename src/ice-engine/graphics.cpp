@@ -54,44 +54,59 @@ static void tranlsate_window_flags(uint32_t * const sdl_flags, uint16_t flags)
 {
     uint32_t result = 0;
 
-    if(HAS_FLAG(flags,ice::init_flags::ICE_INIT_TIMER))
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_FULLSCREEN))
     {
-        result |= SDL_INIT_TIMER;
+        result |= SDL_WINDOW_FULLSCREEN;
     }
 
-    if(HAS_FLAG(flags,ice::init_flags::ICE_INIT_AUDIO))
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_FULLSCREEN_DESKTOP))
     {
-        result |= SDL_INIT_AUDIO;
+        result |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
 
-    if(HAS_FLAG(flags,ice::init_flags::ICE_INIT_VIDEO))
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_OPENGL))
     {
-        result |= SDL_INIT_VIDEO;
+        result |= SDL_WINDOW_OPENGL;
     }
 
-    if(HAS_FLAG(flags,ice::init_flags::ICE_INIT_JOYSTICK))
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_VULKAN))
     {
-        result |= SDL_INIT_JOYSTICK;
+        result |= SDL_WINDOW_VULKAN;
     }
 
-    if(HAS_FLAG(flags,ice::init_flags::ICE_INIT_HAPTIC))
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_HIDDEN))
     {
-        result |= SDL_INIT_HAPTIC;
+        result |= SDL_WINDOW_HIDDEN;
     }
 
-    if(HAS_FLAG(flags,ice::init_flags::ICE_INIT_GAMECONTROLLER))
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_BORDERLESS))
     {
-        result |= SDL_INIT_GAMECONTROLLER;
+        result |= SDL_WINDOW_BORDERLESS;
     }
 
-    if(HAS_FLAG(flags,ice::init_flags::ICE_INIT_EVENTS))
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_RESIZABLE))
     {
-        result |= SDL_INIT_EVENTS;
+        result |= SDL_WINDOW_RESIZABLE;
     }
 
-    if(HAS_FLAG(flags,ice::init_flags::ICE_INIT_EVERYTHING))
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_MINIMIZED))
     {
-        result |= SDL_INIT_EVERYTHING;
+        result |= SDL_WINDOW_MINIMIZED;
+    }
+
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_MAXIMIZED))
+    {
+        result |= SDL_WINDOW_MAXIMIZED;
+    }
+
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_INPUT_GRABBED))
+    {
+        result |= SDL_WINDOW_INPUT_GRABBED;
+    }
+
+    if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_ALLOW_HIGHDPI))
+    {
+        result |= SDL_WINDOW_ALLOW_HIGHDPI;
     }
 
     *sdl_flags = result;
