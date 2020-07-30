@@ -1,5 +1,9 @@
 #include "common.h"
 #include "ice-engine/argparse.h"
+#include <shared_mutex>
+#include <mutex>
+#include <vector>
+// Server class
 
 class server
 {
@@ -8,9 +12,11 @@ private:
     ice::native_socket_t _srv;
     std::string _file_path;
     std::thread _thread;
+    std::vector<std::thread> thread_list;
+    uint8_t threads;
     bool _running;
     // research mutex
-    std::mutex _file_lock;
+    std::shared_timed_mutex _file_lock;
 
 
     /**
@@ -25,6 +31,7 @@ private:
         uint32_t length)
     {
         // research mutex
+        std::unique_lock<std::shared_timed_mutex> file_lock(_file_lock, std::defer_lock);
         common::response_header response_header;
         std::fstream file(_file_path, std::ios::out | std::ios::app);
         std::vector<uint8_t> buffer;
@@ -42,11 +49,13 @@ private:
                 buffer.data(), 
                 static_cast<uint32_t>(buffer.size()));
 
+	    file_lock.lock();
             file.write(reinterpret_cast<const char*>(buffer.data()),
                 buffer.size());
             
             file << std::endl;
-        }
+	    file_lock.unlock();
+	 }
         
         common::write_response_header(
             client_socket,&response_header);           
@@ -61,6 +70,7 @@ private:
     void dump_entries(ice::ssl_socket & client_socket)
     {
         // research mutex
+        std::shared_lock<std::shared_timed_mutex> file_lock(_file_lock, std::defer_lock);
         common::response_header response_header;
         uint32_t file_size = common::file_size(_file_path);
         std::array<uint8_t, common::BUFFER_SIZE> buffer;
@@ -77,9 +87,11 @@ private:
             common::write_response_header(
                 client_socket, 
                 &response_header);
-            
+
             while(file.good())
             {
+	        file_lock.lock();
+
                 file.read(
                     reinterpret_cast<char*>(
                         buffer.data()),
@@ -87,7 +99,9 @@ private:
 
                 common::write_response_body(client_socket, 
                     buffer.data(), static_cast<uint32_t>(file.gcount()));
+                file_lock.unlock();
             }
+
         }
         else
         {
@@ -136,14 +150,18 @@ public:
     server(
         const std::string& cert_file, 
         const std::string& key_file,
-        const uint16_t port) : _ctx(
+        const uint16_t port,
+	uint8_t num_threads) : _ctx(
             ice::SERVER_TCP_SOCKET,
             cert_file,
             key_file)
+	    
     {
         _srv = common::open_socket(common::SERVER, nullptr, port);
         _file_path = "output_file.txt";
         std::fstream file_stream(_file_path, std::ios::out);
+	threads = num_threads;
+        thread_list.reserve(threads);
     }
 
     /**
@@ -156,10 +174,14 @@ public:
     void start()
     {
         listen(_srv,3);
-        _thread = std::thread([this]
-        {
-            this->run();
-        });
+	// iterate for num threads
+        while(thread_list.size() < thread_list.capacity())
+	{ 
+           thread_list.push_back(std::thread([this]
+           {
+               this->run();
+           }));
+	}
         _running = true;
     }
 
@@ -191,7 +213,11 @@ public:
     void stop()
     {
         common::close_socket(_srv);
-        _thread.join();
+	for (std::vector<std::thread>::iterator it = thread_list.begin();
+	     it < thread_list.end(); ++it)
+	{
+            it->join();
+	}
         _running = false;
     }
 
@@ -209,7 +235,8 @@ public:
 static void server_main(
     const std::string& cert,
     const std::string& key,
-    const uint16_t port);
+    const uint16_t port,
+    const uint8_t threads);
 
 
 /**
@@ -227,7 +254,7 @@ int main(const int argc, const char ** argv)
     parser.add_argument("-p","--port","port",true);
     parser.add_argument("-c","--cert","cert",true);
     parser.add_argument("-k","--key","key",true);
-    // parser.add_argument("-t","--threads","threads",true);
+    parser.add_argument("-t","--threads","threads",true);
     parser.enable_help();
 
 
@@ -239,14 +266,16 @@ int main(const int argc, const char ** argv)
     if(!parser.parse(argc,argv) 
         && parser.exists("port") 
         && parser.exists("key") 
-        && parser.exists("cert"))
+        && parser.exists("cert")
+	&& parser.exists("threads"))
     {
         try
         {
             server_main(
                 parser.get<std::string>("cert"),
                 parser.get<std::string>("key"),
-                parser.get<uint16_t>("port"));
+                parser.get<uint16_t>("port"),
+		parser.get<uint8_t>("threads"));
         }
         catch(const std::exception& e)
         {
@@ -283,10 +312,11 @@ void signal_handler(int signal)
 static void server_main(
     const std::string& cert,
     const std::string& key,
-    const uint16_t port)
+    const uint16_t port,
+    const uint8_t threads)
 {
     running = true;
-    server log_server(cert, key, port);
+    server log_server(cert, key, port, threads);
 #ifdef _WIN32 
     SetConsoleCtrlHandler(console_ctrl_handler, TRUE);
 #else
