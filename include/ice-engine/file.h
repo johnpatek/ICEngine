@@ -48,7 +48,7 @@ public:
 
     file(const std::string& path, const uint8_t flags);
 
-    ~file();
+    ~file() = default;
 
     // Open/Close
     bool open(const std::string& path, const uint8_t flags);
