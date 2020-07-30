@@ -148,7 +148,8 @@ ice::tls_server::tls_server(
     const std::string& cert_path,
     const std::string& key_path,
     const ice::request_handler_t& request_handler,
-    const uint16_t port) : _ctx(
+    const uint16_t port,
+    const uint32_t threads) : _ctx(
         ice::SERVER_TCP_SOCKET,
         cert_path,
         key_path)
@@ -162,6 +163,7 @@ ice::tls_server::tls_server(
     addr.sin_port = htons(port);
     bind(_socket,reinterpret_cast<struct sockaddr*>(&addr),
         sizeof(sockaddr_in));
+    _threads.reserve(threads);
 }
 
 ice::tls_server::~tls_server()
@@ -172,12 +174,11 @@ ice::tls_server::~tls_server()
     }
 }
 
-void ice::tls_server::start(
-    const uint32_t threads)
+void ice::tls_server::start()
 {
     _running = true;
     listen(_socket, 100);
-    while(_threads.size() < threads)
+    while(_threads.size() < _threads.capacity())
     {
         _threads.push_back(std::thread([this]()
         {
@@ -190,7 +191,7 @@ void ice::tls_server::run()
 {
     ice::native_socket_t native_socket;
     struct sockaddr_in addr;
-    unsigned int addr_len;
+    socklen_t addr_len;
     bool loop(true);
     while(loop)
     {
