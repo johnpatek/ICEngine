@@ -1,5 +1,19 @@
+#ifndef FILE_H
+#define FILE_H
 #include <memory>
 #include <string>
+#include <cstdio>
+#ifdef _WIN32
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <io.h>
+#else
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
 
 
 
@@ -57,3 +71,5 @@ public:
     bool is_open() const;
 };
 }
+
+#endif

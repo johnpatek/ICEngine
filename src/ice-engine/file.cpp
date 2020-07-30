@@ -1,13 +1,15 @@
 #include "ice-engine/file.h"
-#ifdef _WIN32
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <io.h>
-#include <stdio.h>
-#else
 
-#endif
+// System calls
+static int32_t system_open(const char * const path, uint16_t flags);
+
+static int32_t system_close(int32_t fd);
+
+static int32_t system_read(int32_t fd, uint8_t * const buf, uint32_t len);
+
+static int32_t system_write(int32_t fd, const uint8_t * const buf, uint32_t len);
+
+
 
 struct file_handle
 {
@@ -66,12 +68,14 @@ uint32_t ice::file::seek(uint32_t offset, int seek_position)
 // State information
 std::string ice::file::get_error() const
 {
-    return "";
+    return reinterpret_cast<file_handle*>(
+        _file_handle.get())->error_message;
 }
 
 bool ice::file::has_error() const
 {
-    return false;
+    return reinterpret_cast<file_handle*>(
+        _file_handle.get())->has_error;
 }
 
 bool ice::file::is_open() const
@@ -88,11 +92,7 @@ static void * open_file(const std::string& path, const uint8_t flags)
     bool writable;
     bool has_error;
     std::string error_message;
-#ifdef _WIN32
-    file_descriptor = _open(path.c_str(),open_flags);
-#else
-    file_descriptor = open(path.c_str(),open_flags);
-#endif
+    file_descriptor = system_open(path.c_str(),open_flags);
     has_error = (file_descriptor < 0);
     open = !has_error;
     error_message = (has_error)?"Failed to open file":"";
@@ -126,3 +126,20 @@ static void file_deleter(void * handle)
 {
 
 }
+
+// System calls
+static int32_t system_open(const char * const path, uint16_t flags)
+{
+    int32_t result;
+#ifdef WIN32
+    result = _open(path,flags);
+#else
+    
+#endif
+}
+
+static int32_t system_close(int32_t fd);
+
+static int32_t system_read(int32_t fd, uint8_t * const buf, uint32_t len);
+
+static int32_t system_write(int32_t fd, const uint8_t * const buf, uint32_t len);
