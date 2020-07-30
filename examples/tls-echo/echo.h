@@ -1,11 +1,15 @@
 #include <ice-engine/network.h>
+#include <algorithm>
 #include <array>
 #include <random>
 #include <thread>
 #include <vector>
-
 #include <cstring>
-
+#ifdef _WIN32
+#else
+#include <signal.h>
+#include <unistd.h>
+#endif
 namespace echo
 {
 
