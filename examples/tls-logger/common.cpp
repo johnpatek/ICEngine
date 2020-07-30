@@ -141,7 +141,7 @@ ice::native_socket_t common::open_socket(
     {
         addr = {0};
         addr.sin_family = AF_INET;
-        addr.sin_addr.s_addr = inet_addr(host);
+        inet_pton(AF_INET,host,&addr.sin_addr.s_addr);
         addr.sin_port = htons(port);
         len = sizeof(addr);
 

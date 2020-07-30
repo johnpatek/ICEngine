@@ -1,6 +1,6 @@
 #ifndef ARGPARSE_H
 #define ARGPARSE_H
-
+#include "common.h"
 #include <algorithm>
 #include <cctype>
 #include <cstring>

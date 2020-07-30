@@ -1,5 +1,6 @@
 #ifndef NETWORK_H
 #define NETWORK_H
+#include "common.h"
 #include <functional>
 #include <iostream>
 #include <memory>
