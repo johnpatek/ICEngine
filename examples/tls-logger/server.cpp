@@ -49,12 +49,13 @@ private:
                 buffer.data(), 
                 static_cast<uint32_t>(buffer.size()));
 
-            file_lock.lock();
+	    file_lock.lock();
             file.write(reinterpret_cast<const char*>(buffer.data()),
                 buffer.size());
             
             file << std::endl;
-        }
+	    file_lock.unlock();
+	 }
         
         common::write_response_header(
             client_socket,&response_header);           
@@ -69,7 +70,7 @@ private:
     void dump_entries(ice::ssl_socket & client_socket)
     {
         // research mutex
-        std::shared_lock<std::shared_timed_mutex> file_lock(_file_lock);
+        std::shared_lock<std::shared_timed_mutex> file_lock(_file_lock, std::defer_lock);
         common::response_header response_header;
         uint32_t file_size = common::file_size(_file_path);
         std::array<uint8_t, common::BUFFER_SIZE> buffer;
@@ -86,9 +87,11 @@ private:
             common::write_response_header(
                 client_socket, 
                 &response_header);
-            
+
             while(file.good())
             {
+	        file_lock.lock();
+
                 file.read(
                     reinterpret_cast<char*>(
                         buffer.data()),
@@ -96,7 +99,9 @@ private:
 
                 common::write_response_body(client_socket, 
                     buffer.data(), static_cast<uint32_t>(file.gcount()));
+                file_lock.unlock();
             }
+
         }
         else
         {
@@ -156,7 +161,7 @@ public:
         _file_path = "output_file.txt";
         std::fstream file_stream(_file_path, std::ios::out);
 	threads = num_threads;
-        thread_list.resize(threads);
+        thread_list.reserve(threads);
     }
 
     /**
@@ -170,13 +175,12 @@ public:
     {
         listen(_srv,3);
 	// iterate for num threads
-	for (std::vector<std::thread>::iterator it = thread_list.begin();
-	    it != thread_list.end(); ++it)
-	{
-          *it = std::thread([this]
-          {
-            this->run();
-          });
+        while(thread_list.size() < thread_list.capacity())
+	{ 
+           thread_list.push_back(std::thread([this]
+           {
+               this->run();
+           }));
 	}
         _running = true;
     }
@@ -209,7 +213,11 @@ public:
     void stop()
     {
         common::close_socket(_srv);
-        _thread.join();
+	for (std::vector<std::thread>::iterator it = thread_list.begin();
+	     it < thread_list.end(); ++it)
+	{
+            it->join();
+	}
         _running = false;
     }
 
