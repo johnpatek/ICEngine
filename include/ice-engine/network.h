@@ -1,8 +1,11 @@
 #ifndef NETWORK_H
 #define NETWORK_H
-#include <string>
-#include <memory>
+#include <functional>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 #if defined(_WIN32)
 #include <Winsock2.h>
 #include <ws2tcpip.h>
@@ -86,5 +89,33 @@ namespace ice
             const uint8_t * const data, 
             uint32_t size);
     };
+
+
+    typedef std::function<void(ssl_socket&,const struct sockaddr* const,int32_t)> request_handler_t;
+
+    class tls_server
+    {
+    private:
+        std::vector<std::thread> _threads;  
+        request_handler_t _request_handler;
+        bool _running;
+        native_socket_t _socket;
+        ssl_context _ctx;
+    public:
+        tls_server(
+            const std::string& cert_path,
+            const std::string& key_path,
+            const request_handler_t& request_handler,
+            const uint16_t port);
+        
+        ~tls_server();
+
+        void start(const uint32_t threads);
+        
+        void run();
+        
+        void stop();
+    };
+
 }
 #endif

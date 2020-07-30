@@ -442,7 +442,10 @@ echo::server::server(
     const std::string& cert_file, 
     const std::string& key_file, 
     const uint16_t port, 
-    const uint32_t threads) : _ctx(ice::SERVER_TCP_SOCKET,cert_file,key_file)
+    const uint32_t threads) : _ctx(
+        ice::SERVER_TCP_SOCKET,
+        cert_file,key_file), _random_engine(
+        std::random_device()())
 {
     _port = port;
     _threads = threads;
@@ -463,6 +466,7 @@ void echo::server::start()
     {
         throw std::runtime_error("Failed to listen on socket");
     }
+    _running = true;
     while(_thread_vector.size() < _threads)
     {
         _thread_vector.push_back(std::thread([this]
