@@ -17,7 +17,7 @@ set(PROJ_INCLUDE ${CMAKE_SOURCE_DIR}/include)
 if(WIN32)
     set(PTHREAD "")
     find_library(SSL_LIB_NAME libssl-1_1-x64.lib PATHS ${COMMON_LIB})
-    find_library(SDL2_LIB_NAME SDL2_staticd.lib PATHS ${COMMON_LIB})
+    find_library(SDL2_LIB_NAME SDL2_static.lib PATHS ${COMMON_LIB})
     find_library(CRYPTO_LIB_NAME libcrypto-1_1-x64.lib PATHS ${COMMON_LIB})
     set(DL "")
 else()
@@ -26,6 +26,7 @@ else()
     find_package(Threads REQUIRED)    
     set(PTHREAD Threads::Threads)
     find_library(SSL_LIB_NAME libssl.a PATHS ${COMMON_LIB})
+    find_library(SDL2_LIB_NAME libSDL2_static.a PATHS ${COMMON_LIB})
     find_library(CRYPTO_LIB_NAME libcrypto.a PATHS ${COMMON_LIB})
     find_library(DL libdl.so PATHS /usr/lib/x86_64-linux-gnu/)
 endif(WIN32)
@@ -41,6 +42,7 @@ if(WIN32)
         ice-engine-sdk 
         STATIC
         ${ENGINE_SOURCES})
+    #set_property(TARGET ice-engine-sdk PROPERTY POSITION_INDEPENDENT_CODE ON)
 else()
     add_library(
         ice-engine-sdk 
@@ -60,6 +62,8 @@ target_link_libraries(
     ${DL}
     ${PTHREAD}
     ${SSL_LIB_NAME}
-    ${CRYPTO_LIB_NAME})
+    ${CRYPTO_LIB_NAME}
+    ${SDL2_LIB_NAME}
+    ${SETUP_API})
 
 add_subdirectory(examples)
