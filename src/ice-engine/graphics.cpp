@@ -120,6 +120,26 @@ static void * init_window(
     uint32_t h,
     uint32_t flags)
 {
+    if(x == ice::position_flags::ICE_POSITION_CENTERED)
+    {
+        x = SDL_WINDOWPOS_CENTERED;
+    }
+
+    if(y == ice::position_flags::ICE_POSITION_CENTERED)
+    {
+        y = SDL_WINDOWPOS_CENTERED;
+    }
+
+    if(x == ice::position_flags::ICE_POSITION_UNDEFINED)
+    {
+        x = SDL_WINDOWPOS_UNDEFINED;
+    }
+
+    if(y == ice::position_flags::ICE_POSITION_UNDEFINED)
+    {
+        y = SDL_WINDOWPOS_UNDEFINED;
+    }
+
     return static_cast<void*>(SDL_CreateWindow(title,x,y,w,h,flags));
 }
 

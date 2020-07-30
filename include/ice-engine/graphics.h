@@ -70,6 +70,12 @@ namespace ice
         ICE_WINDOW_ALLOW_HIGHDPI = 1 << 10
     };
 
+    enum position_flags
+    {
+        ICE_POSITION_UNDEFINED,
+        ICE_POSITION_CENTERED
+    };
+
     void init_graphics(const uint8_t flags);
 
     void quit_graphics();
@@ -110,6 +116,14 @@ namespace ice
             uint32_t height);
     };
 
+    class renderer
+    {
+    private:
+        std::shared_ptr<void> _renderer_data;
+    public:
+
+    };
+
     class surface
     {
     private:
@@ -118,13 +132,15 @@ namespace ice
 
     };
 
-    class renderer
+    class texture
     {
     private:
-        std::shared_ptr<void> _renderer_data;
+        std::shared_ptr<void> _texture_data;
     public:
 
     };
+
+    
 }
 
 #endif
