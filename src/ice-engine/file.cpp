@@ -33,6 +33,8 @@ static int close_file(void * handle);
 
 static void file_deleter(void * handle);
 
+static uint32_t system_seek(int32_t fd, uint32_t offset, int origin);
+
 ice::file::file(const std::string& path, const uint8_t flags)
 {
     if(!open(path,flags))
@@ -78,9 +80,10 @@ int32_t ice::file::write(const uint8_t * const buf, uint32_t len)
 }
 
 // Positional operations
-uint32_t ice::file::seek(uint32_t offset, int seek_position)
+uint32_t ice::file::seek(uint32_t offset, int seek_origin)
 {
-    return 0;
+    return system_seek(reinterpret_cast<native_file_handle*>(
+        _file_handle.get())->file_descriptor,offset,seek_origin);
 }
 
 // State information
@@ -237,6 +240,46 @@ static int32_t system_write(int32_t fd, const uint8_t * const buf, uint32_t len)
     result = _write(fd, buf, len);
 #else
     result = write(fd, buf, len);
+#endif
+    return result;
+}
+
+static uint32_t system_seek(int32_t fd, uint32_t offset, int origin)
+{
+    int32_t result;
+    int origin_flag;
+    
+    if(origin == ice::CUR)
+    {
+        origin_flag = SEEK_CUR;
+    }
+    else if(origin == ice::SET)
+    {
+        origin_flag = SEEK_SET;
+    }
+    else if(origin == ice::END)
+    {
+        origin_flag = SEEK_END;
+    }
+    #ifndef _WIN32
+    else if(origin == ice::DATA)
+    {
+        origin_flag = SEEK_DATA;
+    }
+    else if(origin == ice::HOLE)
+    {
+        origin_flag = SEEK_HOLE;
+    }
+    #endif
+    else
+    {
+        origin_flag = -1;
+    }
+
+#ifdef WIN32
+    result = _lseek(fd,offset,origin_flag);
+#else
+    result = lseek(fd,offset,origin_flag);
 #endif
     return result;
 }

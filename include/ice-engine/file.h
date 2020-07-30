@@ -30,13 +30,15 @@ enum open_flags
     WRONLY = 1 << 6
 };
 
-enum seek_positions
+enum seek_origins
 {
     SET,
     CUR,
-    END,
+#ifndef _WIN32
     DATA,
-    HOLE
+    HOLE,
+#endif
+    END
 };
 
 class file
@@ -61,7 +63,7 @@ public:
     int32_t write(const uint8_t * const buf, uint32_t len);
 
     // Positional operations
-    uint32_t seek(uint32_t offset, int seek_position);
+    uint32_t seek(uint32_t offset, int seek_origin);
 
     // State information
     std::string get_error() const;
