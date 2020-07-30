@@ -106,11 +106,12 @@ namespace ice
             const std::string& cert_path,
             const std::string& key_path,
             const request_handler_t& request_handler,
-            const uint16_t port);
+            const uint16_t port,
+            const uint32_t threads);
         
         ~tls_server();
 
-        void start(const uint32_t threads);
+        void start();
         
         void run();
         
