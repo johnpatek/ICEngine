@@ -144,6 +144,19 @@ int32_t ice::ssl_socket::connect()
     return static_cast<int32_t>(SSL_connect(static_cast<SSL*>(_ssl.get())));
 }
 
+bool ice::ssl_socket::has_pending() const
+{
+    return SSL_has_pending(
+        static_cast<SSL*>(_ssl.get())) > 0;
+}
+
+uint32_t ice::ssl_socket::pending() const
+{
+    return static_cast<uint32_t>(
+        SSL_pending(
+            static_cast<SSL*>(_ssl.get())));
+}
+
 ice::tls_server::tls_server(
     const std::string& cert_path,
     const std::string& key_path,

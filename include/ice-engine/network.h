@@ -89,6 +89,10 @@ namespace ice
         int32_t write(
             const uint8_t * const data, 
             uint32_t size);
+
+        bool has_pending() const;
+
+        uint32_t pending() const;
     };
 
 
