@@ -59,6 +59,7 @@ target_include_directories(
 target_link_libraries(
     ice-engine-sdk 
     PUBLIC
+    sndio
     ${DL}
     ${PTHREAD}
     ${SSL_LIB_NAME}
