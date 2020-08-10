@@ -10,6 +10,9 @@
 #include <condition_variable>
 #include <shared_mutex>
 
+namespace ice
+{
+
 class threadpool
 {
 private:
@@ -17,7 +20,7 @@ private:
     std::queue<std::function<void()>> work_queue;
     std::vector<std::thread> worker_threads;
     std::condition_variable_any thread_cv;
-    std::shared_timed_mutex cv_mutex;
+    mutable std::shared_timed_mutex cv_mutex;
     bool mStop;
 public:
     threadpool(uint8_t num_threads);
@@ -40,12 +43,26 @@ public:
           work_queue.push(work);
        }
 
-       thread_cv.notify_all();
+       thread_cv.notify_one();
        return result;
     }
 
+   template<class F, class... Args>
+   std::result_of<F(Args...)> call(F&& f, Args&&...args)
+   {
+      return call_async(f,args...).wait();
+   }
+
     void run_worker_thread(void);
+
     ~threadpool();
+
+   void shutdown();
+
+   bool has_work() const;
+
+   size_t work() const;
+
 };
 
 
@@ -65,14 +82,21 @@ private:
       }
    };
 
+   std::vector<std::thread> _threads;
+   
    std::priority_queue<
       work_t,
       std::vector<work_t>,
       compare_work> _queue;
-   std::shared_timed_mutex _mutex;
+   
+   mutable std::shared_timed_mutex _mutex;
+   
    std::condition_variable_any _cv;
+   
    bool _stop;
+
 public:
+
    priority_threadpool(size_t pool_size);
 
    ~priority_threadpool();
@@ -107,7 +131,20 @@ public:
       return result;
    }   
 
+   template<class F, class... Args>
+   std::result_of<F(Args...)> call(
+      int priority,F&& f, Args&&...args)
+   {
+      return call_async(priority,f,args...).wait();
+   }
+
    void shutdown();
+
+   bool has_work() const;
+
+   size_t work() const;
 };
 
+
+}
 #endif
