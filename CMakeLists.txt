@@ -20,6 +20,7 @@ if(WIN32)
     find_library(SDL2_LIB_NAME SDL2_static.lib PATHS ${COMMON_LIB})
     find_library(CRYPTO_LIB_NAME libcrypto-1_1-x64.lib PATHS ${COMMON_LIB})
     set(DL "")
+    set(BCM "")
 else()
     set(CMAKE_CXX_FLAGS  "-std=c++14")
     set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -29,6 +30,10 @@ else()
     find_library(SDL2_LIB_NAME libSDL2_static.a PATHS ${COMMON_LIB})
     find_library(CRYPTO_LIB_NAME libcrypto.a PATHS ${COMMON_LIB})
     find_library(DL libdl.so PATHS /usr/lib/x86_64-linux-gnu/)
+    find_library(BCM libbcm_host.so PATHS /opt/vc/lib)
+    if(NOT BCM)
+        set(BCM "")
+    endif()
 endif(WIN32)
 
 include_directories(${PROJ_INCLUDE} ${COMMON_INCLUDE})
@@ -42,7 +47,6 @@ if(WIN32)
         ice-engine-sdk 
         STATIC
         ${ENGINE_SOURCES})
-    #set_property(TARGET ice-engine-sdk PROPERTY POSITION_INDEPENDENT_CODE ON)
 else()
     add_library(
         ice-engine-sdk 
@@ -64,6 +68,7 @@ target_link_libraries(
     ${SSL_LIB_NAME}
     ${CRYPTO_LIB_NAME}
     ${SDL2_LIB_NAME}
-    ${SETUP_API})
+    ${SETUP_API}
+    ${BCM})
 
 add_subdirectory(examples)
