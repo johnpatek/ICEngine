@@ -16,8 +16,8 @@ private:
     /* data */
     std::queue<std::function<void()>> work_queue;
     std::vector<std::thread> worker_threads;
-    std::condition_variable thread_cv;
-    std::mutex cv_mutex;
+    std::condition_variable_any thread_cv;
+    std::shared_timed_mutex cv_mutex;
     bool mStop;
 public:
     threadpool(uint8_t num_threads);
@@ -36,7 +36,7 @@ public:
 
        // context for releasing lock after shared value is modified
        {
-          std::unique_lock<std::mutex> _lock(cv_mutex);
+          std::unique_lock<std::shared_timed_mutex> _lock(cv_mutex);
           work_queue.push(work);
        }
 

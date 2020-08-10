@@ -34,7 +34,7 @@ void threadpool::run_worker_thread(void)
     {
         std::function<void()> work_task;
         {
-            std::unique_lock<std::mutex> _lock(cv_mutex);
+            std::unique_lock<std::shared_timed_mutex> _lock(cv_mutex);
 	    std::cout<< "thread_id: "<< std::this_thread::get_id() << std::endl;
             thread_cv.wait(_lock, [&]{return (!work_queue.empty() || mStop); }); // or stopping
             if(mStop)
@@ -52,7 +52,7 @@ void threadpool::run_worker_thread(void)
 
 threadpool::~threadpool()
 {
-    std::unique_lock<std::mutex> _lock(cv_mutex);
+    std::unique_lock<std::shared_timed_mutex> _lock(cv_mutex);
     mStop = true;
     thread_cv.notify_all();
 }
