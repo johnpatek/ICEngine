@@ -3,6 +3,7 @@
 #include "common.h"
 #include <functional>
 #include <iostream>
+#include <list>
 #include <memory>
 #include <string>
 #include <thread>
@@ -26,7 +27,7 @@ namespace ice
 #if defined(_WIN32)
     typedef SOCKET native_socket_t;
 #else
-    typedef int32_t native_socket_t;
+    typedef int native_socket_t;
 #endif
     enum peer_types
     {
@@ -78,25 +79,27 @@ namespace ice
 
         ~ssl_socket() = default;
 
-        int32_t accept();
+        bool accept();
 
-        int32_t connect();
+        bool connect();
 
-        int32_t read(
+        ssize_t read(
             uint8_t * const data, 
-            uint32_t size);
+            size_t size);
 
-        int32_t write(
+        ssize_t write(
             const uint8_t * const data, 
-            uint32_t size);
+            size_t size);
 
         bool has_pending() const;
 
-        uint32_t pending() const;
+        size_t pending() const;
+
+        ice::native_socket_t native_handle() const;
     };
 
 
-    typedef std::function<void(ssl_socket&,const struct sockaddr* const,int32_t)> request_handler_t;
+    typedef std::function<void(ssl_socket&,const struct sockaddr* const,ssize_t)> request_handler_t;
 
     class tls_server
     {
@@ -112,7 +115,7 @@ namespace ice
             const std::string& key_path,
             const request_handler_t& request_handler,
             const uint16_t port,
-            const uint32_t threads);
+            const size_t threads);
         
         ~tls_server();
 

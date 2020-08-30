@@ -8,7 +8,7 @@
 #include <vector>
 #include <condition_variable>
 
-ice::threadpool::threadpool(uint8_t num_threads)
+ice::threadpool::threadpool(size_t num_threads)
 {
     //
     worker_threads.reserve(num_threads);
@@ -17,33 +17,36 @@ ice::threadpool::threadpool(uint8_t num_threads)
     mStop = false;
     while(worker_threads.size() < worker_threads.capacity())
     {
-        worker_threads.push_back(std::thread([this]
+        worker_threads.push_back(std::thread([&]
         {
-           this->run_worker_thread();
-	}));
-    }
-}
+            std::unique_lock<std::shared_timed_mutex> lock(
+                cv_mutex, 
+                std::defer_lock);
+            while(!mStop)
+            {
+                std::function<void()> job;
+            
+                lock.lock();
+                
+                thread_cv.wait(lock,[&]
+                {
+                    return mStop || !work_queue.empty();
+                });
+                
+                if(!work_queue.empty())
+                {
+                    job = std::move(work_queue.front());
+                    work_queue.pop();
+                }
 
+                lock.unlock();
 
-void ice::threadpool::run_worker_thread(void)
-{
-    while(1)
-    {
-        std::function<void()> work_task;
-        {
-            std::unique_lock<std::shared_timed_mutex> _lock(cv_mutex);
-	    std::cout<< "thread_id: "<< std::this_thread::get_id() << std::endl;
-            thread_cv.wait(_lock, [&]{return (!work_queue.empty() || mStop); }); // or stopping
-            if(mStop)
-	    {
-                std::cout<< "exiting thread_id: "<< std::this_thread::get_id() << std::endl;
-                break;
-	    } 
-            std::cout<<"we're here"<<std::endl;
-	    work_task = work_queue.front();
-	    work_queue.pop();
-	}
-        work_task();
+                if(job)
+                {
+                    job();
+                }
+            }
+	    }));
     }
 }
 
@@ -103,9 +106,14 @@ ice::priority_threadpool::priority_threadpool(size_t pool_size)
                 
                 if(!_queue.empty())
                 {
-                    job = _queue.top().second;
+                    job = std::move(
+                        _queue.top().second);
                     _queue.pop();
                     lock.unlock();
+                }
+
+                if(job)
+                {
                     job();
                 }
             }

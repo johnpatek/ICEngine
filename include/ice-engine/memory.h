@@ -12,8 +12,8 @@ namespace ice
     {
     private:
         uint8_t * _buf;
-        uint32_t size;
-        uint32_t free_size;
+        uint32_t _size;
+        uint32_t _free_size;
 
         struct memory_block
         {

@@ -1,50 +1,26 @@
 # Design Proposal
 
-### Client
+## Protocol
 
-+ Start:
-    + Initialize system services:
-        + OpenSSL, SDL, threadpool, etc.
-    + Start subsystems:
-        + Graphics: textures, windows
-        + Physics: collisions, friction, particles
-        + Network: encryption keys, sockets
-        + Devices: keyboard, mouse, game controller 
-+ Run:
-    + Event loop
-        + Each subsystem is polled for events
-        + Events are submitted with priority
-        + Priority threadpool executes callbacks
-    + Objects
-        + Visibility: unique, shared
-        + Lifecycle: temporary, persistent
-+ Stop:
-    + Quit system services
-    + Delete unique objects
+All data is in the form of a message.
 
-### Server
+### Message Structure
 
-+ Start
-    + Initialize system services:
-        + OpenSSL
-+ Run
-    + Listen for incoming connections
-    + Handle requests
-+ Stop
-    + Delete shared objects
+Each message will start with a header containing at least:
++ Message type
++ Message length
 
-## Protocol Design
+There are 5 message types:
++ Join: Client joins game
++ Create: Client creates new resource
++ Update: Client changes resource property
++ Delete: Client removes resource
++ Quit: Client leaves game
 
-### Request Header
-+ Command: post, poll
-+ Path/key: Up to 255 bytes
-+ Timestamp: time of last local update
-+ Length
-### Request Body
-+ byte buffer
+## Client
 
-### Response Header
-+ Status: post, poll
-+ Path/key: Up to 255 bytes
-+ Timestamp: time of last remote update
-+ Length
+The client will form persistent connections to the server and will manage all of its own resource data. If it is modifying a shared resource, it must create a message and send it to the server.
+
+## Server
+
+The server is responsible for receiving messages from the clients, and handling them appropriately:

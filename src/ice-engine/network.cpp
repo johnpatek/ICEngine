@@ -114,9 +114,9 @@ ice::ssl_socket::ssl_socket(
         ssl_deleter);
 }
 
-int32_t ice::ssl_socket::read(
+ssize_t ice::ssl_socket::read(
             uint8_t * const data, 
-            uint32_t size)
+            size_t size)
 {
     return SSL_read(
         static_cast<SSL*>(_ssl.get()),
@@ -124,9 +124,9 @@ int32_t ice::ssl_socket::read(
         size);
 }
 
-int32_t ice::ssl_socket::write(
+ssize_t ice::ssl_socket::write(
     const uint8_t * const data, 
-    uint32_t size)
+    size_t size)
 {
     return SSL_write(
         static_cast<SSL*>(_ssl.get()),
@@ -134,14 +134,14 @@ int32_t ice::ssl_socket::write(
         size);
 }
 
-int32_t ice::ssl_socket::accept()
+bool ice::ssl_socket::accept()
 {
-    return static_cast<int32_t>(SSL_accept(static_cast<SSL*>(_ssl.get())));
+    return SSL_accept(static_cast<SSL*>(_ssl.get())) > 0;
 }
 
-int32_t ice::ssl_socket::connect()
+bool ice::ssl_socket::connect()
 {
-    return static_cast<int32_t>(SSL_connect(static_cast<SSL*>(_ssl.get())));
+    return SSL_connect(static_cast<SSL*>(_ssl.get())) > 0;
 }
 
 bool ice::ssl_socket::has_pending() const
@@ -150,11 +150,16 @@ bool ice::ssl_socket::has_pending() const
         static_cast<SSL*>(_ssl.get())) > 0;
 }
 
-uint32_t ice::ssl_socket::pending() const
+size_t ice::ssl_socket::pending() const
 {
-    return static_cast<uint32_t>(
+    return static_cast<size_t>(
         SSL_pending(
             static_cast<SSL*>(_ssl.get())));
+}
+
+ice::native_socket_t ice::ssl_socket::native_handle() const
+{
+    return SSL_get_fd(static_cast<SSL*>(_ssl.get()));
 }
 
 ice::tls_server::tls_server(
@@ -162,7 +167,7 @@ ice::tls_server::tls_server(
     const std::string& key_path,
     const ice::request_handler_t& request_handler,
     const uint16_t port,
-    const uint32_t threads) : _ctx(
+    const size_t threads) : _ctx(
         ice::SERVER_TCP_SOCKET,
         cert_path,
         key_path)

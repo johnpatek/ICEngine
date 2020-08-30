@@ -1,10 +1,8 @@
-#include <ice-engine/network.h>
-#include <algorithm>
-#include <array>
-#include <random>
-#include <thread>
-#include <vector>
+#ifndef ECHO_H
+#define ECHO_H
+#include <ICEngine.h>
 #include <cstring>
+#include <random>
 #ifdef _WIN32
 #else
 #include <signal.h>
@@ -45,113 +43,101 @@ struct response_header
     uint32_t length;
 };
 
-const uint32_t REQUEST_HEADER_SIZE = sizeof(request_header);
-const uint32_t RESPONSE_HEADER_SIZE = sizeof(response_header);
+const size_t REQUEST_HEADER_SIZE = sizeof(request_header);
+
+const size_t RESPONSE_HEADER_SIZE = sizeof(response_header);
 
 void pack_request_header(
     request_header * const header, 
-    uint8_t command,
-    uint32_t length);
+    int command, 
+    size_t length);
 
-void pack_response_header(
-    response_header * const header, 
-    uint8_t status,
-    uint32_t length);
+void unpack_request_header(
+    const request_header header, 
+    int * const command, 
+    size_t * const length);
 
 void read_request_header(
-    ice::ssl_socket & client_socket, 
+    ice::native_socket_t socket, 
     request_header * const header);
 
 void write_request_header(
-    ice::ssl_socket & client_socket, 
+    ice::native_socket_t socket, 
     const request_header * const header);
 
+void read_request_body(
+    ice::native_socket_t socket,
+    uint8_t * const data,
+    const size_t size);
+
+void write_request_body(
+    ice::native_socket_t socket,
+    uint8_t * const data,
+    const size_t size);
+
+void pack_response_header(
+    response_header * const header, 
+    int status, 
+    size_t length);
+
+void unpack_response_header(
+    const response_header header, 
+    int * const status, 
+    size_t * const length);
+
 void read_response_header(
-    ice::ssl_socket & client_socket, 
+    ice::native_socket_t socket, 
     response_header * const header);
 
 void write_response_header(
-    ice::ssl_socket & client_socket, 
+    ice::native_socket_t socket, 
     const response_header * const header);
 
-uint32_t read_request_body(
-    ice::ssl_socket & client_socket, 
-    uint8_t * const buffer, 
-    uint32_t length);
+void read_response_body(
+    ice::native_socket_t socket,
+    uint8_t * const data,
+    const size_t size);
 
-uint32_t write_request_body(
-    ice::ssl_socket & client_socket, 
-    const uint8_t * const buffer, 
-    uint32_t length);
+void write_response_body(
+    ice::native_socket_t socket,
+    uint8_t * const data,
+    const size_t size);
 
-uint32_t read_response_body(
-    ice::ssl_socket & client_socket, 
-    uint8_t * const buffer, 
-    uint32_t length);
 
-uint32_t write_response_body(
-    ice::ssl_socket & client_socket, 
-    const uint8_t * const buffer, 
-    uint32_t length);
-
-class client
+enum socket_states 
 {
-private:
-    std::string _host;
-    uint16_t _port;
-    ice::ssl_context _ctx;
-
-    void send_request(
-        const uint8_t command, 
-        const uint8_t * const buffer, 
-        const uint32_t length);
-
-public:
-    client(
-        const std::string& host, 
-        const uint16_t port);
-    
-    ~client() = default;
-
-    void echo_message(
-        const std::string& message);
-
-    void capitalize_message(
-        const std::string& message);
-
-    void scramble_message(
-        const std::string& message);
-
-    void reverse_message(
-        const std::string& message);
+    READY,BUSY,CLOSED
 };
 
 class server
 {
 private:
-    ice::ssl_context _ctx;
-    uint16_t _port;
-    ice::native_socket_t _srv;
+    ice::native_socket_t _listener;
+    ice::threadpool _threadpool;
+    std::list<std::pair<std::atomic<int>,ice::native_socket_t>> _connections;
+    std::mutex _connections_mutex;
     std::default_random_engine _random_engine;
-    uint32_t _threads;
-    std::vector<std::thread> _thread_vector;
+    server_callback_t _server_callback;
     bool _running;
-
-    void handle_request(ice::ssl_socket & client_socket);
-
 public:
     server(
-        const std::string& cert_file, 
-        const std::string& key_file, 
-        const uint16_t port, 
-        const uint32_t threads);
-
-    ~server();
+        uint16_t port,
+        const size_t threads,
+        const server_callback_t& server_callback);
 
     void start();
 
-    void run();
-    
+    void run(bool * const loop);
+
     void stop();
+
+    void close_connection(const ice::native_socket_t socket);
+
+    std::default_random_engine& random_engine();
 };
+
+typedef std::function<void(server * const,ice::native_socket_t)> server_callback_t;
+
 }
+
+#endif

@@ -23,7 +23,7 @@ private:
     mutable std::shared_timed_mutex cv_mutex;
     bool mStop;
 public:
-    threadpool(uint8_t num_threads);
+    threadpool(size_t num_threads = std::thread::hardware_concurrency());
     template<class F, class... Args>
     std::future<typename std::result_of<F(Args...)>::type> call_async(F&& f, Args&&...args)
     {
@@ -97,7 +97,7 @@ private:
 
 public:
 
-   priority_threadpool(size_t pool_size);
+   priority_threadpool(size_t pool_size = std::thread::hardware_concurrency());
 
    ~priority_threadpool();
 
@@ -144,7 +144,6 @@ public:
 
    size_t work() const;
 };
-
 
 }
 #endif

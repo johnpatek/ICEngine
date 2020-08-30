@@ -10,3 +10,6 @@
 [submodule "common/googletest"]
 	path = common/googletest
 	url = https://github.com/google/googletest
+[submodule "common/capnproto"]
+	path = common/capnproto
+	url = https://github.com/johnpatek/capnproto.git
