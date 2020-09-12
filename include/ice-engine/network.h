@@ -1,6 +1,7 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 #include "common.h"
+#include "system.h"
 #include <functional>
 #include <iostream>
 #include <list>
@@ -8,27 +9,9 @@
 #include <string>
 #include <thread>
 #include <vector>
-#if defined(_WIN32)
-#include <Winsock2.h>
-#include <ws2tcpip.h>
-#include <io.h>
-#pragma  comment(lib, "ws2_32.lib ")
-#else /* Unix */
-#include <arpa/inet.h> 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>
-#endif
 
 namespace ice
 {
-#if defined(_WIN32)
-    typedef SOCKET native_socket_t;
-#else
-    typedef int native_socket_t;
-#endif
     enum peer_types
     {
         CLIENT_TCP_SOCKET,
@@ -58,7 +41,7 @@ namespace ice
 
         ~ssl_context() = default;
 
-        void * data() const;
+        void * data() const;    
     };
     
     class ssl_socket

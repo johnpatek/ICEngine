@@ -18,6 +18,7 @@
 #pragma comment(lib, "wmcodecdspuuid.lib")
 #pragma comment(lib, "msdmo.lib")
 #pragma comment(lib, "Strmiids.lib")
+#pragma comment(lib, "ws2_32.lib ")
 
 // As specified by Stack Overflow
 #pragma comment(lib, "kernel32.lib")
@@ -76,7 +77,15 @@ namespace ice
         ICE_POSITION_CENTERED
     };
 
-    void init_graphics(const uint8_t flags);
+    enum renderer_flags
+    {
+        ICE_RENDERER_SOFTWARE,
+        ICE_RENDERER_ACCELERATED,
+        ICE_RENDERER_PRESENTVSYNC,
+        ICE_RENDERER_TARGETTEXXTURE
+    };
+
+    void init_graphics(const int flags);
 
     void quit_graphics();
 
@@ -89,31 +98,31 @@ namespace ice
 
         window(
             const std::string& title,
-            uint32_t x, 
-            uint32_t y, 
-            uint32_t width, 
-            uint32_t height, 
-            uint16_t flags);
+            size_t x, 
+            size_t y, 
+            size_t width, 
+            size_t height, 
+            int flags);
         
         ~window();
 
         void create(
             const std::string& title,
-            uint32_t x, 
-            uint32_t y, 
-            uint32_t width, 
-            uint32_t height, 
-            uint16_t flags);
+            size_t x, 
+            size_t y, 
+            size_t width, 
+            size_t height, 
+            int flags);
         
         void destroy();
 
         void get_size(
-            uint32_t * const width, 
-            uint32_t * const height)/* const? */;
+            size_t * const width, 
+            size_t * const height)/* const? */;
         
         void set_size(
-            uint32_t width, 
-            uint32_t height);
+            size_t width, 
+            size_t height);
     };
 
     class renderer
@@ -121,7 +130,7 @@ namespace ice
     private:
         std::shared_ptr<void> _renderer_data;
     public:
-
+        renderer(window& w, int index, int flags);
     };
 
     class surface

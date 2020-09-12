@@ -3,9 +3,9 @@
 
 #define HAS_FLAG(VAL, FLAG) ((VAL & FLAG) > 0)
 
-static void tranlsate_init_flags(uint32_t * const sdl_flags, uint8_t flags)
+static void tranlsate_init_flags(int * const sdl_flags, int flags)
 {
-    uint32_t result = 0;
+    int result = 0;
 
     if(HAS_FLAG(flags,ice::init_flags::ICE_INIT_TIMER))
     {
@@ -50,9 +50,9 @@ static void tranlsate_init_flags(uint32_t * const sdl_flags, uint8_t flags)
     *sdl_flags = result;
 }
 
-static void tranlsate_window_flags(uint32_t * const sdl_flags, uint16_t flags)
+static void tranlsate_window_flags(int * const sdl_flags, int flags)
 {
-    uint32_t result = 0;
+    int result = 0;
 
     if(HAS_FLAG(flags,ice::window_flags::ICE_WINDOW_FULLSCREEN))
     {
@@ -114,11 +114,11 @@ static void tranlsate_window_flags(uint32_t * const sdl_flags, uint16_t flags)
 
 static void * init_window(
     const char * const title, 
-    uint32_t x, 
-    uint32_t y,
-    uint32_t w,
-    uint32_t h,
-    uint32_t flags)
+    size_t x, 
+    size_t y,
+    size_t w,
+    size_t h,
+    int flags)
 {
     if(x == ice::position_flags::ICE_POSITION_CENTERED)
     {
@@ -140,7 +140,13 @@ static void * init_window(
         y = SDL_WINDOWPOS_UNDEFINED;
     }
 
-    return static_cast<void*>(SDL_CreateWindow(title,x,y,w,h,flags));
+    return static_cast<void*>(SDL_CreateWindow(
+        title,
+        static_cast<int>(x),
+        static_cast<int>(y),
+        static_cast<int>(w),
+        static_cast<int>(h),
+        static_cast<uint32_t>(flags)));
 }
 
 static void window_deleter(void * data)
@@ -148,9 +154,9 @@ static void window_deleter(void * data)
     SDL_DestroyWindow(static_cast<SDL_Window*>(data));
 }
 
-void ice::init_graphics(const uint8_t flags)
+void ice::init_graphics(const int flags)
 {
-    uint32_t sdl_flags;
+    int sdl_flags;
     tranlsate_init_flags(&sdl_flags,flags);
     SDL_Init(sdl_flags);
 }
@@ -167,11 +173,11 @@ ice::window::window()
 
 ice::window::window(
     const std::string& title,
-    uint32_t x, 
-    uint32_t y, 
-    uint32_t width, 
-    uint32_t height, 
-    uint16_t flags)
+    size_t x, 
+    size_t y, 
+    size_t width, 
+    size_t height, 
+    int flags)
 {
     create(title,x,y,width,height,flags);
 }
@@ -179,7 +185,7 @@ ice::window::window(
 
 ice::window::~window()
 {
-    if(_window_data.get() != nullptr)
+    if(_window_data.unique() && _window_data.get() != nullptr)
     {
         destroy();
     }
@@ -188,13 +194,13 @@ ice::window::~window()
 
 void ice::window::create(
     const std::string& title,
-    uint32_t x, 
-    uint32_t y, 
-    uint32_t width, 
-    uint32_t height, 
-    uint16_t flags)
+    size_t x, 
+    size_t y, 
+    size_t width, 
+    size_t height, 
+    int flags)
 {
-    uint32_t sdl_flags;
+    int sdl_flags;
     void * window_data;
 
     tranlsate_window_flags(&sdl_flags,flags);
