@@ -19,7 +19,7 @@ int main(const int argc, const char ** argv)
 
     window->destroy();
 
-    ice::quit_graphics();
+    ice::quit_system();
 
     return 0;
 }

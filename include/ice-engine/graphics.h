@@ -56,6 +56,11 @@ namespace ice
         ICE_INIT_EVERYTHING = 127
     };
 
+    void init_system(int flags);
+
+    void quit_system();
+
+
     enum window_flags
     {
         ICE_WINDOW_FULLSCREEN = 1,
@@ -76,18 +81,6 @@ namespace ice
         ICE_POSITION_UNDEFINED,
         ICE_POSITION_CENTERED
     };
-
-    enum renderer_flags
-    {
-        ICE_RENDERER_SOFTWARE,
-        ICE_RENDERER_ACCELERATED,
-        ICE_RENDERER_PRESENTVSYNC,
-        ICE_RENDERER_TARGETTEXXTURE
-    };
-
-    void init_graphics(const int flags);
-
-    void quit_graphics();
 
     class window
     {
@@ -116,6 +109,8 @@ namespace ice
         
         void destroy();
 
+        void * get_data();
+
         void get_size(
             size_t * const width, 
             size_t * const height)/* const? */;
@@ -123,6 +118,24 @@ namespace ice
         void set_size(
             size_t width, 
             size_t height);
+
+    };
+
+
+    struct rectangle
+    {
+        int x_position;
+        int y_position;
+        int width;
+        int height;
+    };
+
+    enum renderer_flags
+    {
+        ICE_RENDERER_SOFTWARE = 1,
+        ICE_RENDERER_ACCELERATED = 1 << 1,
+        ICE_RENDERER_PRESENTVSYNC = 1 << 2,
+        ICE_RENDERER_TARGETTEXXTURE = 1 << 3
     };
 
     class renderer
@@ -130,7 +143,56 @@ namespace ice
     private:
         std::shared_ptr<void> _renderer_data;
     public:
-        renderer(window& w, int index, int flags);
+        renderer();
+
+        renderer(window& wind, int index, int flags);
+
+        ~renderer();
+
+        void create(window& wind, int index, int flags);
+
+        void destroy();
+
+        void * get_data();
+
+        void present();
+
+        void clear();
+
+        void draw_rectangle(const rectangle& rect);
+
+        void fill_rectangle(const rectangle& rect);
+
+        void set_target(texture& txtr);
+
+        void set_target_default();
+
+        void get_draw_color(
+            uint8_t& red, 
+            uint8_t& green, 
+            uint8_t& blue, 
+            uint8_t& alpha);
+
+        void set_draw_color(
+            uint8_t red, 
+            uint8_t green, 
+            uint8_t blue, 
+            uint8_t alpha);
+
+        void copy(texture& src_txtr);
+
+        void partial_copy_source(
+            texture& src_txtr, 
+            const rectangle& src_rect);
+
+        void partial_copy_destination(
+            texture& src_txtr, 
+            const rectangle& dst_rect);
+
+        void partial_copy(
+            texture& src_txtr, 
+            const rectangle& src_rect, 
+            const rectangle& dst_rect);
     };
 
     class surface
@@ -146,7 +208,25 @@ namespace ice
     private:
         std::shared_ptr<void> _texture_data;
     public:
+        texture();
 
+        texture(
+            renderer& rend, 
+            int format, 
+            int access, 
+            int width, 
+            int height);
+        
+        void create(
+            renderer& rend, 
+            int format, 
+            int access, 
+            int width, 
+            int height);
+
+        void destory();
+
+        void * get_data();
     };
 
     

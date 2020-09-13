@@ -154,14 +154,17 @@ static void window_deleter(void * data)
     SDL_DestroyWindow(static_cast<SDL_Window*>(data));
 }
 
-void ice::init_graphics(const int flags)
+void ice::init_system(int flags)
 {
     int sdl_flags;
     tranlsate_init_flags(&sdl_flags,flags);
-    SDL_Init(sdl_flags);
+    if(SDL_Init(sdl_flags) < 0)
+    {
+        throw std::runtime_error("System failed to initialize");
+    }
 }
 
-void ice::quit_graphics()
+void ice::quit_system()
 {
     SDL_Quit();
 }
@@ -221,3 +224,46 @@ void ice::window::destroy()
     _window_data = nullptr;
 }
 
+static void translate_renderer_flags(int * const sdl_flags, int flags)
+{
+    int result;
+
+    if(HAS_FLAG(flags,ice::renderer_flags::ICE_RENDERER_SOFTWARE))
+    {
+        result |= SDL_RENDERER_SOFTWARE;
+    }
+
+    if(HAS_FLAG(flags,ice::renderer_flags::ICE_RENDERER_ACCELERATED))
+    {
+        result |= SDL_RENDERER_ACCELERATED;
+    }
+
+    if(HAS_FLAG(flags,ice::renderer_flags::ICE_RENDERER_PRESENTVSYNC))
+    {
+        result |= SDL_WINDOW_OPENGL;
+    }
+
+    if(HAS_FLAG(flags,ice::renderer_flags::ICE_RENDERER_TARGETTEXXTURE))
+    {
+        result |= SDL_WINDOW_VULKAN;
+    }
+
+
+}
+
+static void * init_renderer(SDL_Window * const window, int index, int flags)
+{
+    int sdl_flags;
+}
+
+static void renderer_deleter(void * renderer)
+{
+    SDL_DestroyRenderer(
+        reinterpret_cast<SDL_Renderer*>(renderer));
+}
+
+
+void ice::renderer::create(ice::window& wind, int index, int flags)
+{
+    
+}
