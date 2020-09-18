@@ -40,7 +40,9 @@ include_directories(${PROJ_INCLUDE} ${COMMON_INCLUDE})
 
 file(GLOB ENGINE_SOURCES
     "include/ice-engine/*.h"    
-    "src/ice-engine/*.cpp")
+    "include/ICEngine.h"    
+    "src/ice-engine/*.cpp"
+    "src/ICEngine.cpp")
 
 if(WIN32)
     add_library(

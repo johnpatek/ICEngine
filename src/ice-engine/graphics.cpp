@@ -240,7 +240,7 @@ static void translate_renderer_flags(int * const sdl_flags, int flags)
 
     if(HAS_FLAG(flags,ice::renderer_flags::ICE_RENDERER_PRESENTVSYNC))
     {
-        result |= SDL_WINDOW_OPENGL;
+        result |= SDL_RENDERER_PRESENTVSYNC;
     }
 
     if(HAS_FLAG(flags,ice::renderer_flags::ICE_RENDERER_TARGETTEXXTURE))
@@ -248,12 +248,12 @@ static void translate_renderer_flags(int * const sdl_flags, int flags)
         result |= SDL_WINDOW_VULKAN;
     }
 
-
+    *sdl_flags = result; 
 }
 
 static void * init_renderer(SDL_Window * const window, int index, int flags)
 {
-    int sdl_flags;
+    return SDL_CreateRenderer(window,index,flags);
 }
 
 static void renderer_deleter(void * renderer)

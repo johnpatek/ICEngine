@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include "common.h"
+#include "event.h"
 #ifdef _WIN32
 #undef WIN32_HIGH_RES_TIMING
 #include <windows.h>
@@ -19,8 +20,6 @@
 #pragma comment(lib, "msdmo.lib")
 #pragma comment(lib, "Strmiids.lib")
 #pragma comment(lib, "ws2_32.lib ")
-
-// As specified by Stack Overflow
 #pragma comment(lib, "kernel32.lib")
 #pragma comment(lib, "hid.lib")
 #pragma comment(lib, "imagehlp.lib")
@@ -44,6 +43,11 @@
 
 namespace ice
 {
+    class renderer;
+    class surface;
+    class texture;
+    class window;
+    
     enum init_flags
     {
         ICE_INIT_TIMER = 1,
@@ -60,6 +64,11 @@ namespace ice
 
     void quit_system();
 
+    bool poll_system_events(
+        std::pair<bool,key_event>& key_event_listener,
+        std::pair<bool,mouse_event>& mouse_event_listener,
+        std::pair<bool,quit_event>& quit_event_listener,
+        std::pair<bool,window_event>& window_event_listener);
 
     enum window_flags
     {

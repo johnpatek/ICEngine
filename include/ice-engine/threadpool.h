@@ -23,29 +23,29 @@ private:
     mutable std::shared_timed_mutex cv_mutex;
     bool mStop;
 public:
-    threadpool(size_t num_threads = std::thread::hardware_concurrency());
-    template<class F, class... Args>
-    std::future<typename std::result_of<F(Args...)>::type> call_async(F&& f, Args&&...args)
-    {
-       using return_type = typename std::result_of<F(Args...)>::type;
+   threadpool(size_t num_threads = std::thread::hardware_concurrency());
+   
+   template<class F, class... Args>
+   std::future<typename std::result_of<F(Args...)>::type> call_async(F&& f, Args&&...args)
+   {
+      using return_type = typename std::result_of<F(Args...)>::type;
+      std::unique_lock<std::shared_timed_mutex> lock(cv_mutex);
+      auto task = std::make_shared<std::packaged_task <return_type()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+      std::future<return_type> result = task->get_future();
 
-       auto task = std::make_shared<std::packaged_task <return_type()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
-       std::future<return_type> result = task->get_future();
+      std::function<void()> work([task]()
+      {
+         (*task)();
+      });
 
-       std::function<void()> work([task]()
-       {
-          (*task)();
-       });
+      // context for releasing lock after shared value is modified
+      lock.lock()
+      work_queue.push(work);
+      lock.unlock();
 
-       // context for releasing lock after shared value is modified
-       {
-          std::unique_lock<std::shared_timed_mutex> _lock(cv_mutex);
-          work_queue.push(work);
-       }
-
-       thread_cv.notify_one();
-       return result;
-    }
+      thread_cv.notify_one();
+      return result;
+   }
 
    template<class F, class... Args>
    std::result_of<F(Args...)> call(F&& f, Args&&...args)
