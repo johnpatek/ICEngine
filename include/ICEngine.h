@@ -27,7 +27,7 @@ class client;
 
 typedef std::function<void(client&)> client_callback_t;
 
-class client : public engine
+class client
 {
 private:
     bool _running;
