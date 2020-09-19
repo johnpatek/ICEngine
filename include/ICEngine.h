@@ -12,6 +12,8 @@
 
 namespace ice
 {
+class client;
+
 #define CLIENT_HANDLER(EVENT_TYPE)                                   \
 public:                                                              \
     void set_ ## EVENT_TYPE ## _callback(                            \
@@ -23,16 +25,15 @@ private:                                                             \
     std::pair<bool,EVENT_TYPE> _ ## EVENT_TYPE ## _listener;         \
     EVENT_TYPE ## _callback_t _ ## EVENT_TYPE ## _callback
 
-class client;
 
-typedef std::function<void(client&)> client_callback_t;
+typedef std::function<void(engine&)> client_callback_t;
 
 class client
 {
 private:
     bool _running;
     engine _engine;
-    resource_client _resource_client;
+    resource_manager _resource_manager;
     CLIENT_HANDLER(key_event);
     CLIENT_HANDLER(mouse_event);
     CLIENT_HANDLER(quit_event);
@@ -40,9 +41,20 @@ private:
 public:
     client(size_t threads);
     
-    client(size_t threads, std::string& host, uint16_t port);
+    client(size_t threads, const std::string& host, uint16_t port);
 
     ~client();
+
+    void create_resource(
+        const std::string& name, 
+        const resource& data);
+
+    void update_resource(
+        const std::string& name, 
+        const resource& data);
+    
+    void destroy_resource(
+        const std::string& name);
 
     void connect(std::string& host, uint16_t port);
     
@@ -50,36 +62,11 @@ public:
     
     void disconnect();
 
+    void set_init_function(const server_callback_t& function);
+    void set_loop_function(const server_callback_t& function);
+
+    void init(int subsystem_flags);
     void loop();
-    
-    void add_resource_type(
-        const std::string& type_name,
-        const resource_create_t& constructor,
-        const resource_destroy_t& destructor,
-        const resource_update_t& updater);
-
-    bool has_resource_type(
-        const std::string& type_name) const;
-    
-    void remove_resource_type(
-        const std::string& type_name);
-
-    void create_resource_data( 
-        const std::string& resource_name,
-        const std::string& type_name,
-        const uint8_t * const data,
-        size_t length);
-    
-    bool has_resource_data(
-        const std::string& resource_name) const;
-
-    void update_resource_data(
-        const std::string& resource_name,
-        const uint8_t * const data,
-        size_t length);
-
-    void delete_resource_data(
-        const std::string& resource_name);
 };
 
 class session
@@ -119,7 +106,7 @@ public:
 
 class server;
 
-typedef std::function<void(server&)> server_callback_t;
+typedef std::function<void(engine&)> server_callback_t;
 
 class server
 {
@@ -132,10 +119,21 @@ public:
     server(uint16_t port);
     ~server();
     
+    void create_resource(
+        const std::string& name, 
+        const resource& data);
+
+    void udpate_resource(
+        const std::string& name, 
+        const resource& data);
+    
+    void destroy_resource(
+        const std::string& name);
+
     void set_start_function(const server_callback_t& function);
     void set_loop_function(const server_callback_t& function);
     void set_stop_function(const server_callback_t& function);
-    
+
     void start();
     void loop();
     void stop();

@@ -21,6 +21,14 @@ namespace ice
         ICE_KEY_RELEASED
     };
 
+    enum key_codes
+    {
+        ICE_KEY_CODE_UP,
+        ICE_KEY_CODE_DOWN,
+        ICE_KEY_CODE_LEFT,
+        ICE_KEY_CODE_RIGHT
+    };
+
     class key_event
     {
         EVENT_PROPERTY(int,event_type);
