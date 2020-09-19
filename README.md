@@ -1,13 +1,6 @@
 # ICE ENGINE
 
-after_success:
-  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
-  - chmod +x send.sh
-  - ./send.sh success $WEBHOOK_URL
-after_failure:
-  - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
-  - chmod +x send.sh
-  - ./send.sh failure $WEBHOOK_URL
+[![Build Status](https://travis-ci.com/johnpatek/ICEngine.svg?branch=master)](https://travis-ci.com/johnpatek/ICEngine)
 
 ![alt text](https://d30y9cdsu7xlg0.cloudfront.net/png/84009-200.png "We are still using this image")
 
