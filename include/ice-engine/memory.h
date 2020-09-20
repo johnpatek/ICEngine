@@ -72,7 +72,7 @@ namespace ice
 
     };
 
-    template<uint32_t size> class stack_buffer : public std::array<uint8_t,size>
+    template<size_t size> class stack_buffer : public std::array<uint8_t,size>
     {
 
     };
