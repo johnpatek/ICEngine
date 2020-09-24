@@ -13,18 +13,9 @@ framework.
 
 First, build the common dependencies. Then, run the build scripts.
 
-### Windows
-
-```powershell
-build_common.bat
-cmake.bat
-```
-
-### Linux
-
 ```sh
-./build_common.sh
-./cmake.sh
+python3 cmake.py --common
+python3 cmake.py
 ```
 ## TODO
 
