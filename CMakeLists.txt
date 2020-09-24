@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.0)
 
 project(ice-engine C CXX)
 
+if (CMAKE_VERSION VERSION_LESS "3.1")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+    endif()
+else()
+    set(CMAKE_CXX_STANDARD 14)
+endif()
+
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 
 set(COMMON_ROOT ${CMAKE_SOURCE_DIR}/common/build/install)
@@ -40,7 +48,9 @@ include_directories(${PROJ_INCLUDE} ${COMMON_INCLUDE})
 
 file(GLOB ENGINE_SOURCES
     "include/ice-engine/*.h"    
-    "src/ice-engine/*.cpp")
+    "include/ICEngine.h"    
+    "src/ice-engine/*.cpp"
+    "src/ICEngine.cpp")
 
 if(WIN32)
     add_library(
@@ -71,4 +81,10 @@ target_link_libraries(
     ${SETUP_API}
     ${BCM})
 
-add_subdirectory(examples)
+if(BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
+
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

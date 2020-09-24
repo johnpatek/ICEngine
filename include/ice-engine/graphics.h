@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <string>
 #include "common.h"
+#include "event.h"
 #ifdef _WIN32
 #undef WIN32_HIGH_RES_TIMING
 #include <windows.h>
@@ -18,8 +19,7 @@
 #pragma comment(lib, "wmcodecdspuuid.lib")
 #pragma comment(lib, "msdmo.lib")
 #pragma comment(lib, "Strmiids.lib")
-
-// As specified by Stack Overflow
+#pragma comment(lib, "ws2_32.lib ")
 #pragma comment(lib, "kernel32.lib")
 #pragma comment(lib, "hid.lib")
 #pragma comment(lib, "imagehlp.lib")
@@ -43,6 +43,11 @@
 
 namespace ice
 {
+    class renderer;
+    class surface;
+    class texture;
+    class window;
+    
     enum init_flags
     {
         ICE_INIT_TIMER = 1,
@@ -54,6 +59,16 @@ namespace ice
         ICE_INIT_EVENTS = 1 << 6,
         ICE_INIT_EVERYTHING = 127
     };
+
+    void init_system(int flags);
+
+    void quit_system();
+
+    bool poll_system_events(
+        std::pair<bool,key_event>& key_event_listener,
+        std::pair<bool,mouse_event>& mouse_event_listener,
+        std::pair<bool,quit_event>& quit_event_listener,
+        std::pair<bool,window_event>& window_event_listener);
 
     enum window_flags
     {
@@ -76,10 +91,6 @@ namespace ice
         ICE_POSITION_CENTERED
     };
 
-    void init_graphics(const uint8_t flags);
-
-    void quit_graphics();
-
     class window
     {
     private:
@@ -89,31 +100,51 @@ namespace ice
 
         window(
             const std::string& title,
-            uint32_t x, 
-            uint32_t y, 
-            uint32_t width, 
-            uint32_t height, 
-            uint16_t flags);
+            size_t x, 
+            size_t y, 
+            size_t width, 
+            size_t height, 
+            int flags);
         
         ~window();
 
         void create(
             const std::string& title,
-            uint32_t x, 
-            uint32_t y, 
-            uint32_t width, 
-            uint32_t height, 
-            uint16_t flags);
+            size_t x, 
+            size_t y, 
+            size_t width, 
+            size_t height, 
+            int flags);
         
         void destroy();
 
+        void * get_data();
+
         void get_size(
-            uint32_t * const width, 
-            uint32_t * const height)/* const? */;
+            size_t * const width, 
+            size_t * const height)/* const? */;
         
         void set_size(
-            uint32_t width, 
-            uint32_t height);
+            size_t width, 
+            size_t height);
+
+    };
+
+
+    struct rectangle
+    {
+        int x_position;
+        int y_position;
+        int width;
+        int height;
+    };
+
+    enum renderer_flags
+    {
+        ICE_RENDERER_SOFTWARE = 1,
+        ICE_RENDERER_ACCELERATED = 1 << 1,
+        ICE_RENDERER_PRESENTVSYNC = 1 << 2,
+        ICE_RENDERER_TARGETTEXXTURE = 1 << 3
     };
 
     class renderer
@@ -121,7 +152,56 @@ namespace ice
     private:
         std::shared_ptr<void> _renderer_data;
     public:
+        renderer();
 
+        renderer(window& wind, int index, int flags);
+
+        ~renderer();
+
+        void create(window& wind, int index, int flags);
+
+        void destroy();
+
+        void * get_data();
+
+        void present();
+
+        void clear();
+
+        void draw_rectangle(const rectangle& rect);
+
+        void fill_rectangle(const rectangle& rect);
+
+        void set_target(texture& txtr);
+
+        void set_target_default();
+
+        void get_draw_color(
+            uint8_t& red, 
+            uint8_t& green, 
+            uint8_t& blue, 
+            uint8_t& alpha);
+
+        void set_draw_color(
+            uint8_t red, 
+            uint8_t green, 
+            uint8_t blue, 
+            uint8_t alpha);
+
+        void copy(texture& src_txtr);
+
+        void partial_copy_source(
+            texture& src_txtr, 
+            const rectangle& src_rect);
+
+        void partial_copy_destination(
+            texture& src_txtr, 
+            const rectangle& dst_rect);
+
+        void partial_copy(
+            texture& src_txtr, 
+            const rectangle& src_rect, 
+            const rectangle& dst_rect);
     };
 
     class surface
@@ -137,7 +217,25 @@ namespace ice
     private:
         std::shared_ptr<void> _texture_data;
     public:
+        texture();
 
+        texture(
+            renderer& rend, 
+            int format, 
+            int access, 
+            int width, 
+            int height);
+        
+        void create(
+            renderer& rend, 
+            int format, 
+            int access, 
+            int width, 
+            int height);
+
+        void destory();
+
+        void * get_data();
     };
 
     

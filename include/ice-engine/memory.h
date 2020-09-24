@@ -12,8 +12,8 @@ namespace ice
     {
     private:
         uint8_t * _buf;
-        uint32_t size;
-        uint32_t free_size;
+        uint32_t _size;
+        uint32_t _free_size;
 
         struct memory_block
         {
@@ -72,7 +72,7 @@ namespace ice
 
     };
 
-    template<uint32_t size> class stack_buffer : public std::array<uint8_t,size>
+    template<size_t size> class stack_buffer : public std::array<uint8_t,size>
     {
 
     };

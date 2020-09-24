@@ -1,5 +1,7 @@
 # ICE ENGINE
 
+[![Build Status](https://travis-ci.com/johnpatek/ICEngine.svg?branch=master)](https://travis-ci.com/johnpatek/ICEngine)
+
 ![alt text](https://d30y9cdsu7xlg0.cloudfront.net/png/84009-200.png "We are still using this image")
 
 ## About this Project
@@ -11,18 +13,9 @@ framework.
 
 First, build the common dependencies. Then, run the build scripts.
 
-### Windows
-
-```powershell
-build_common.bat
-cmake.bat
-```
-
-### Linux
-
 ```sh
-./build_common.sh
-./cmake.sh
+python3 cmake.py --common
+python3 cmake.py
 ```
 ## TODO
 
