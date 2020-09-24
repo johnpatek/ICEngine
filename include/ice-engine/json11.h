@@ -65,7 +65,7 @@ private:
         Number(long double x) { prec = LDBL_DIG; value = x; }
         Number(double x) { prec = DBL_DIG; value = x; }
         Number(float x) { prec = FLT_DIG; value = x; }
-        Number(long long x) { prec = DBL_DIG; value = x; }
+        Number(long long x) { prec = DBL_DIG; value = static_cast<long double>(x); }
         Number(long x) { prec = -1; value = x; }
         Number(int x) { prec = -1; value = x; }
         Number(std::istream&);

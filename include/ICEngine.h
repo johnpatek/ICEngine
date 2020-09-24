@@ -1,3 +1,5 @@
+#ifndef ICENGINE_H
+#define ICENGINE_H
 #include "ice-engine/common.h"
 #include "ice-engine/engine.h"
 #include "ice-engine/graphics.h"
@@ -32,6 +34,8 @@ class client
 {
 private:
     bool _running;
+    bool _connected;
+    native_socket_t _socket;
     engine _engine;
     resource_manager _resource_manager;
     CLIENT_HANDLER(key_event);
@@ -56,14 +60,14 @@ public:
     void destroy_resource(
         const std::string& name);
 
-    void connect(std::string& host, uint16_t port);
+    void connect(const std::string& host, uint16_t port);
     
     bool is_connected();
     
     void disconnect();
 
-    void set_init_function(const server_callback_t& function);
-    void set_loop_function(const server_callback_t& function);
+    void set_init_function(const client_callback_t& function);
+    void set_loop_function(const client_callback_t& function);
 
     void init(int subsystem_flags);
     void loop();
@@ -139,3 +143,5 @@ public:
     void stop();
 };
 }
+
+#endif

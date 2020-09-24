@@ -15,18 +15,49 @@ namespace ice
     protected:
         ice::threadpool _threadpool;
     public:
-        template<class F, class... Args>
-        std::future<typename std::result_of<F(Args...)>::type> call_async(F&& f, Args&&...args) noexcept
+        engine(size_t threads) : _threadpool(threads)
         {
-            return _threadpool.call_async(f,args...);
+
         }
 
         template<class F, class... Args>
-        std::result_of<F(Args...)> call(F&& f, Args&&...args) noexcept
+        std::future<typename std::result_of<F(Args...)>::type> call_async(
+            F&& f, 
+            Args&&...args) noexcept
         {
-            using result_type = std::result_of<F(Args...)>::type;
-            std::future<result_type> result = _threadpool.call(f,args);
-            return result.get();
+            return _threadpool.call_async(
+                std::forward<F>(f), 
+                std::forward<Args>(args)...);
+        }
+
+        template<class F, class... Args>
+        std::result_of<F(Args...)> call(
+            F&& f, 
+            Args&&...args) noexcept
+        {
+            return _threadpool.call_async(
+                std::forward<F>(f), 
+                std::forward<Args>(args)...).get();
+        }
+
+        template<class F, class... Args>
+        std::future<void> execute_async(
+            F&& f, 
+            Args&&...args) noexcept
+        {
+            _threadpool.execute_async(
+                std::forward<F>(f), 
+                std::forward<Args>(args)...);
+        }
+
+        template<class F, class... Args>
+        void execute(
+            F&& f, 
+            Args&&...args) noexcept
+        {
+            _threadpool.execute_async(
+                std::forward<F>(f), 
+                std::forward<Args>(args)...).get();
         }
     };
     

@@ -18,11 +18,17 @@ int main(const int argc, const char ** argv)
             ice::position_flags::ICE_POSITION_CENTERED,
             ice::position_flags::ICE_POSITION_CENTERED,
             640,
-            480);
+            480,
+            0);
         
         renderer = std::make_shared<ice::renderer>(*window,-1,0);
 
         texture = std::make_shared<ice::texture>();
+
+        rectangle.x_position = 50;
+        rectangle.y_position = 100;
+        rectangle.width = 100;
+        rectangle.height = 100;
     });
 
     client.set_loop_function([&](ice::engine& engine)

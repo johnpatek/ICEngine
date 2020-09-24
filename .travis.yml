@@ -2,7 +2,9 @@
 language: cpp
 
 script:
-  - echo "Testing pipeline"
+  - sudo apt install -y python3
+  - python3 cmake.py --common
+  - python3 cmake.py --tests
 
 after_success:
   - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh

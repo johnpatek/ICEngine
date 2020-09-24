@@ -50,6 +50,16 @@ static void tranlsate_init_flags(int * const sdl_flags, int flags)
     *sdl_flags = result;
 }
 
+void init_system(int flags)
+{
+
+}
+
+void quit_system()
+{
+
+}
+
 static void tranlsate_window_flags(int * const sdl_flags, int flags)
 {
     int result = 0;
@@ -262,8 +272,378 @@ static void renderer_deleter(void * renderer)
         reinterpret_cast<SDL_Renderer*>(renderer));
 }
 
+ice::renderer::renderer()
+{
+    _renderer_data = nullptr;
+}
+
+ice::renderer::renderer(ice::window& wind, int index, int flags)
+{
+    create(wind,index,flags);
+}
+
+ice::renderer::~renderer()
+{
+    if(_renderer_data.unique() && _renderer_data != nullptr)
+    {
+        destroy();
+    }
+}
 
 void ice::renderer::create(ice::window& wind, int index, int flags)
 {
-    
+    int sdl_flags = 0;
+    translate_renderer_flags(&sdl_flags,flags);
+    _renderer_data = std::shared_ptr<void>(
+        init_renderer(
+            reinterpret_cast<SDL_Window*>(
+                wind.get_data()),
+            index,
+            sdl_flags),
+        renderer_deleter);
+}
+
+void ice::renderer::destroy()
+{
+    _renderer_data = nullptr;
+}
+
+void * ice::renderer::get_data()
+{
+    return _renderer_data.get();
+}
+
+void ice::renderer::present()
+{
+    SDL_RenderPresent(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()));
+}
+
+void ice::renderer::clear()
+{
+    SDL_RenderClear(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()));
+}
+
+void ice::renderer::draw_rectangle(
+    const ice::rectangle& rect)
+{
+    SDL_RenderDrawRect(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()),
+        reinterpret_cast<const SDL_Rect*>(
+            &rect));
+}
+
+void ice::renderer::fill_rectangle(
+    const ice::rectangle& rect)
+{
+    SDL_RenderFillRect(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()),
+        reinterpret_cast<const SDL_Rect*>(
+            &rect));
+}
+
+void ice::renderer::set_target(
+    ice::texture& txtr)
+{
+    SDL_SetRenderTarget(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()),
+        reinterpret_cast<SDL_Texture*>(
+            &txtr));
+}
+
+void ice::renderer::set_target_default()
+{
+    SDL_SetRenderTarget(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()),
+        nullptr);
+}
+
+void ice::renderer::get_draw_color(
+    uint8_t& red, 
+    uint8_t& green, 
+    uint8_t& blue, 
+    uint8_t& alpha)
+{
+    SDL_GetRenderDrawColor(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()),
+        &red,
+        &green,
+        &blue,
+        &alpha);
+}
+
+void ice::renderer::set_draw_color(
+    uint8_t red, 
+    uint8_t green, 
+    uint8_t blue, 
+    uint8_t alpha)
+{
+    SDL_SetRenderDrawColor(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()),
+        red,
+        green,
+        blue,
+        alpha);
+}
+
+void ice::renderer::copy(
+    ice::texture& src_txtr)
+{
+    SDL_RenderCopy(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()),
+        reinterpret_cast<SDL_Texture*>(
+            &src_txtr),
+        nullptr,
+        nullptr);
+}
+
+void ice::renderer::partial_copy_source(
+    ice::texture& src_txtr, 
+    const ice::rectangle& src_rect)
+{
+    SDL_RenderCopy(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()),
+        reinterpret_cast<SDL_Texture*>(
+            &src_txtr),
+        reinterpret_cast<const SDL_Rect*>(
+            &src_rect),
+        nullptr);
+}
+
+void ice::renderer::partial_copy_destination(
+    ice::texture& src_txtr, 
+    const ice::rectangle& dst_rect)
+{
+    SDL_RenderCopy(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()),
+        reinterpret_cast<SDL_Texture*>(
+            &src_txtr),
+        nullptr,
+        reinterpret_cast<const SDL_Rect*>(
+            &dst_rect));
+}
+
+void ice::renderer::partial_copy(
+    ice::texture& src_txtr, 
+    const ice::rectangle& src_rect, 
+    const ice::rectangle& dst_rect)
+{
+    SDL_RenderCopy(
+        reinterpret_cast<SDL_Renderer*>(
+            _renderer_data.get()),
+        reinterpret_cast<SDL_Texture*>(
+            &src_txtr),
+        reinterpret_cast<const SDL_Rect*>(
+            &src_rect),
+        reinterpret_cast<const SDL_Rect*>(
+            &dst_rect) );
+}
+
+static void create_key_event(ice::key_event& event, const SDL_KeyboardEvent& sdl_event);
+
+bool poll_system_events(
+    std::pair<bool,ice::key_event>& key_event_listener,
+    std::pair<bool,ice::mouse_event>& mouse_event_listener,
+    std::pair<bool,ice::quit_event>& quit_event_listener,
+    std::pair<bool,ice::window_event>& window_event_listener)
+{
+    SDL_Event sdl_event;
+    key_event_listener.first = false;
+    mouse_event_listener.first = false;
+    quit_event_listener.first = false;
+    window_event_listener.first = false;
+    if(SDL_PollEvent(&sdl_event) == 1)
+    {
+        switch(sdl_event.type)
+        {
+            case SDL_KEYUP:
+            case SDL_KEYDOWN:
+                key_event_listener.first = true;
+                create_key_event(key_event_listener.second,sdl_event.key);
+                break;
+            case SDL_QUIT:
+                quit_event_listener.first = true;
+                break;
+        }
+    }
+
+    return true;
+}
+
+static void create_key_event(ice::key_event& event, const SDL_KeyboardEvent& sdl_event)
+{
+    if(sdl_event.type == SDL_KEYUP)
+    {
+        event.set_event_type(
+            ice::key_event_types::ICE_KEY_RELEASED);
+    }
+    else if(sdl_event.type == SDL_KEYDOWN)
+    {
+        event.set_event_type(
+            ice::key_event_types::ICE_KEY_PRESSED);
+    }
+    else
+    {
+        // Make sure this is unreachable
+    }
+
+    event.set_repeat(sdl_event.repeat != 0);
+
+    switch(sdl_event.keysym.sym)
+    {
+#define KEY_CASE(CODE)                                               \
+    case SDLK_ ## CODE ## :                                          \
+        event.set_key_code(                                          \
+            ice::key_codes::ICE_KEY_CODE_ ## CODE ## );              \
+        break                                                        
+        KEY_CASE(BACKSPACE);
+        KEY_CASE(TAB);
+        KEY_CASE(CLEAR);
+        KEY_CASE(RETURN);
+        KEY_CASE(PAUSE);
+        KEY_CASE(SPACE);
+        KEY_CASE(EXCLAIM);
+        KEY_CASE(QUOTEDBL);
+        KEY_CASE(HASH);
+        KEY_CASE(DOLLAR);
+        KEY_CASE(AMPERSAND);
+        KEY_CASE(QUOTE);
+        KEY_CASE(LEFTPAREN);
+        KEY_CASE(RIGHTPAREN);
+        KEY_CASE(ASTERISK);
+        KEY_CASE(PLUS);
+        KEY_CASE(COMMA);
+        KEY_CASE(MINUS);
+        KEY_CASE(PERIOD);
+        KEY_CASE(SLASH);
+        KEY_CASE(0);
+        KEY_CASE(1);
+        KEY_CASE(2);
+        KEY_CASE(3);
+        KEY_CASE(4);
+        KEY_CASE(5);
+        KEY_CASE(6);
+        KEY_CASE(7);
+        KEY_CASE(8);
+        KEY_CASE(9);
+        KEY_CASE(COLON);
+        KEY_CASE(SEMICOLON);
+        KEY_CASE(LESS);
+        KEY_CASE(EQUALS);
+        KEY_CASE(GREATER);
+        KEY_CASE(QUESTION);
+        KEY_CASE(AT);
+        KEY_CASE(LEFTBRACKET);
+        KEY_CASE(BACKSLASH);
+        KEY_CASE(RIGHTBRACKET);
+        KEY_CASE(CARET);
+        KEY_CASE(UNDERSCORE);
+        KEY_CASE(BACKQUOTE);
+        KEY_CASE(a);
+        KEY_CASE(b);
+        KEY_CASE(c);
+        KEY_CASE(d);
+        KEY_CASE(e);
+        KEY_CASE(f);
+        KEY_CASE(g);
+        KEY_CASE(h);
+        KEY_CASE(i);
+        KEY_CASE(j);
+        KEY_CASE(k);
+        KEY_CASE(l);
+        KEY_CASE(m);
+        KEY_CASE(n);
+        KEY_CASE(o);
+        KEY_CASE(p);
+        KEY_CASE(q);
+        KEY_CASE(r);
+        KEY_CASE(s);
+        KEY_CASE(t);
+        KEY_CASE(u);
+        KEY_CASE(v);
+        KEY_CASE(w);
+        KEY_CASE(x);
+        KEY_CASE(y);
+        KEY_CASE(z);
+        KEY_CASE(DELETE);
+        // KEY_CASE(KP0);
+        // KEY_CASE(KP1);
+        // KEY_CASE(KP2);
+        // KEY_CASE(KP3);
+        // KEY_CASE(KP4);
+        // KEY_CASE(KP5);
+        // KEY_CASE(KP6);
+        // KEY_CASE(KP7);
+        // KEY_CASE(KP8);
+        // KEY_CASE(KP9);
+        KEY_CASE(KP_PERIOD);
+        KEY_CASE(KP_DIVIDE);
+        KEY_CASE(KP_MULTIPLY);
+        KEY_CASE(KP_MINUS);
+        KEY_CASE(KP_PLUS);
+        KEY_CASE(KP_ENTER);
+        KEY_CASE(KP_EQUALS);
+        KEY_CASE(UP);
+        KEY_CASE(DOWN);
+        KEY_CASE(RIGHT);
+        KEY_CASE(LEFT);
+        KEY_CASE(INSERT);
+        KEY_CASE(HOME);
+        KEY_CASE(END);
+        KEY_CASE(PAGEUP);
+        KEY_CASE(PAGEDOWN);
+        KEY_CASE(F1);
+        KEY_CASE(F2);
+        KEY_CASE(F3);
+        KEY_CASE(F4);
+        KEY_CASE(F5);
+        KEY_CASE(F6);
+        KEY_CASE(F7);
+        KEY_CASE(F8);
+        KEY_CASE(F9);
+        KEY_CASE(F10);
+        KEY_CASE(F11);
+        KEY_CASE(F12);
+        KEY_CASE(F13);
+        KEY_CASE(F14);
+        KEY_CASE(F15);
+        // KEY_CASE(NUMLOCK);
+        KEY_CASE(CAPSLOCK);
+        // KEY_CASE(SCROLLOCK);
+        KEY_CASE(RSHIFT);
+        KEY_CASE(LSHIFT);
+        KEY_CASE(RCTRL);
+        KEY_CASE(LCTRL);
+        KEY_CASE(RALT);
+        KEY_CASE(LALT);
+        // KEY_CASE(RMETA);
+        // KEY_CASE(LMETA);
+        // KEY_CASE(LSUPER);
+        // KEY_CASE(RSUPER);
+        KEY_CASE(MODE);
+        KEY_CASE(HELP);
+        // KEY_CASE(PRINT);
+        KEY_CASE(SYSREQ);
+        // KEY_CASE(BREAK);
+        KEY_CASE(MENU);
+        KEY_CASE(POWER);
+        // KEY_CASE(EURO);
+        default:
+            event.set_key_code(0);
+            break;
+    }    
+
+
 }

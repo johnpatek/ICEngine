@@ -30,7 +30,11 @@ public:
    {
       using return_type = typename std::result_of<F(Args...)>::type;
       std::unique_lock<std::shared_timed_mutex> lock(cv_mutex);
-      auto task = std::make_shared<std::packaged_task <return_type()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
+      auto task = std::make_shared<std::packaged_task <return_type()>>(
+         std::bind(
+            std::forward<F>(f), 
+            std::forward<Args>(args)...));
+      
       std::future<return_type> result = task->get_future();
 
       std::function<void()> work([task]()
@@ -39,7 +43,7 @@ public:
       });
 
       // context for releasing lock after shared value is modified
-      lock.lock()
+      lock.lock();
       work_queue.push(work);
       lock.unlock();
 
@@ -48,14 +52,18 @@ public:
    }
 
    template<class F, class... Args>
-   std::result_of<F(Args...)> call(F&& f, Args&&...args)
+   std::future<void> execute_async(F&& f, Args&&...args)
    {
-      return call_async(f,args...).wait();
+      std::future<void> result;
+      result = call_async(
+         std::forward<F>(f), 
+         std::forward<Args>(args)...);
+      return result;
    }
 
-    void run_worker_thread(void);
+   void run_worker_thread(void);
 
-    ~threadpool();
+   ~threadpool();
 
    void shutdown();
 

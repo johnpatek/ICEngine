@@ -8,7 +8,7 @@
 
 // Version 0.6.5, 2013-11-07
 
-#include "json11.h"
+#include "ice-engine/json11.h"
 #include <assert.h>
 #include <cmath>
 #include <cfloat>
@@ -45,7 +45,7 @@ int Json::indent;
 int Json::level;
 
 static unsigned currpos(istream& in, unsigned* pos) {
-    unsigned curr = in.tellg();
+    unsigned curr = static_cast<unsigned int>(in.tellg());
     if (pos != nullptr)
         *pos = 0;
     in.seekg(0);   // rewind
@@ -465,7 +465,7 @@ void Json::Array::add(Node* v) {
 void Json::Array::ins(int index, Node* v) {
     assert(v != nullptr);
     if (index < 0)
-        index += list.size();
+        index += static_cast<int>(list.size());
     if (index < 0 || index > (int)list.size())
         throw out_of_range("index out of range");
     list.insert(list.begin() + index, v);
@@ -474,7 +474,7 @@ void Json::Array::ins(int index, Node* v) {
 
 void Json::Array::del(int index) {
     if (index < 0)
-        index += list.size();
+        index += static_cast<int>(list.size());
     Node* v = list.at(index);
     v->unref();
     list.erase(list.begin() + index);
@@ -482,7 +482,7 @@ void Json::Array::del(int index) {
 
 void Json::Array::repl(int index, Node* v) {
     if (index < 0)
-        index += list.size();
+        index += static_cast<int>(list.size());
     Node* u = list.at(index);
     u->unref();
     list[index] = v;
@@ -563,12 +563,12 @@ Json::Number::Number(istream& in) {
         *p++ = c;
         leading = false;
     }
-    prec = p - buf;
+    prec = static_cast<int>(p - buf);
     if (c == '.' && p < end) {
         *p++ = c;
         while (isdigit(c = in.get()) && p < end)
             *p++ = c;
-        prec = p - buf - 1;
+        prec = static_cast<int>(p - buf - 1);
     }
     if ((c == 'e' || c == 'E') && p < end) {
         *p++ = c;
@@ -712,26 +712,26 @@ Json::operator double() const {
 
 Json::operator float() const {
     if (root->type() == Type::NUMBER) {
-        return ((Number*)root)->value;
+        return static_cast<float>(((Number*)root)->value);
     }
     throw bad_cast();
 }
 
 Json::operator int() const {
     if (root->type() == Type::NUMBER)
-        return ((Number*)root)->value;
+        return static_cast<int>(((Number*)root)->value);
     throw bad_cast();
 }
 
 Json::operator long() const {
     if (root->type() == Type::NUMBER)
-        return ((Number*)root)->value;
+        return static_cast<long>(((Number*)root)->value);
     throw bad_cast();
 }
 
 Json::operator long long() const {
     if (root->type() == Type::NUMBER)
-        return ((Number*)root)->value;
+        return static_cast<long long>(((Number*)root)->value);
     throw bad_cast();
 }
 
