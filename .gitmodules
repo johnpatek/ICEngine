@@ -1,12 +1,3 @@
-[submodule "common/sdl2"]
-	path = common/sdl2
-	url = https://github.com/johnpatek/sdl2.git
-[submodule "common/openssl-cmake"]
-	path = common/openssl-cmake
-	url = https://github.com/johnpatek/openssl-cmake.git
-[submodule "common/json11"]
-	path = common/json11
-	url = https://github.com/johnpatek/json11
-[submodule "common/googletest"]
-	path = common/googletest
-	url = https://github.com/google/googletest
+[submodule "extern/grpc"]
+	path = extern/grpc
+	url = https://github.com/grpc/grpc
