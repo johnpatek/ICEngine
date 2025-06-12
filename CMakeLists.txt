@@ -1,11 +1,9 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.15)
 
-project(ice-engine)
+set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 
-option(ICE_SERVER "Build ICEngine server" OFF)
-option(ICE_CLIENT "Build ICEngine client" OFF)
+project(ice-engine VERSION 1.0.0)
 
-find_package(Vulkan)
-find_package(CUDAToolkit)
+option(ICE_SERVER "Build ICEngine server" ON)
+option(ICE_CLIENT "Build ICEngine client" ON)
 
-add_subdirectory(extern)
