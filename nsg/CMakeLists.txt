@@ -1,0 +1,6 @@
+file(GLOB NSG_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+add_library(nsg STATIC ${NSG_SOURCES})
+target_include_directories(nsg PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+if(ICE_TESTS)
+    add_subdirectory(tests)
+endif()

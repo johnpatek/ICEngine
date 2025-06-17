@@ -1,0 +1,21 @@
+namespace authproto;
+
+table AuthenticateRequest {
+  user_data: string;
+}
+
+table AuthenticateResponse {
+  client_id: string;
+}
+
+table TerminateRequest {
+  client_id: string;
+}
+
+table TerminateResponse {
+}
+
+rpc_service AuthService {
+  Authenticate(AuthenticateRequest): AuthenticateResponse;
+  Terminate(TerminateRequest): TerminateResponse;
+}

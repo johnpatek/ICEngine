@@ -1,0 +1,69 @@
+namespace nsgproto;
+
+enum Op : byte {
+  Add,
+  Remove,
+  Update,
+  Move
+}
+
+table BoolValue {
+  value: bool;
+}
+
+table IntValue {
+  value: int;
+}
+
+table DoubleValue {
+  value: double;
+}
+
+table StringValue {
+  value: string;
+}
+
+union Value {
+  BoolValue,
+  IntValue,
+  DoubleValue,
+  StringValue
+}
+
+table Property {
+  key: string;
+  value: Value;
+}
+
+table Command {
+  cmd_type: Op;
+  node_id: string;
+  parent_id: string;
+  properties: [Property];
+}
+
+table ConnectRequest {
+  client_id: string;
+}
+
+table DisconnectRequest {
+  client_id: string;
+}
+
+table CommandBuffer {
+  commands: [Command];
+}
+
+enum Action : byte {
+  Connect,
+  Disconnect
+}
+
+table ClientMessage {
+  action: Action;
+  client_id: string;
+}
+
+rpc_service NetworkSceneGraphService {
+  StreamSceneGraph(ClientMessage): CommandBuffer (streaming: "bidi");
+}

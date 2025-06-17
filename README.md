@@ -25,3 +25,13 @@ Both client and server have the following requirements:
 
 vcpkg is provided as a submodule, but it can be overrided using the 
 `CMAKE_TOOLCHAIN_FILE` variable during configuration.
+
+## Components
+
+The engine built on several underlying components:
+
++ `nsg` - NetworkSceneGraph, an abstract framework for building scene 
+graphs that are synchronized between client and server.
+
++ `assetdb` - Optimized solution for storing, loading, and verifying 
+game assets.

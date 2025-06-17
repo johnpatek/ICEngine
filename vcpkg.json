@@ -1,0 +1,12 @@
+{
+    "name": "ice-engine",
+    "version": "1.0.0",
+    "dependencies": [
+        "sqlite3",
+        "flatbuffers",
+        "vsg",
+        "grpc",
+        "openssl",
+        "sdl3"
+    ]
+}
